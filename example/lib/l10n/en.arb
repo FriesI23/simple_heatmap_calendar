@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "colorTipLeftHelperText": "Less",
+  "@colorTipLeftHelperText": {
+    "description": " tips in the left of colorTip"
+  },
+  "colorTipRightHelperText": "More",
+  "@colorTipRightHelperText": {
+    "description": " tips in the right of colorTip"
+  }
+}
