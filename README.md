@@ -1,6 +1,6 @@
 # Simple Heatmap Calendar
 
-<img src="./assets/readme/title.png" alt= "title" width="600" height="82">
+<img src="https://user-images.githubusercontent.com/20661034/224279041-833335b9-70c5-41b9-826b-0214ac525b6b.png" alt= "title" width="600" height="82">
 
 Powerful and easy-to-use heatmap flutter chart package.
 
@@ -8,13 +8,13 @@ Powerful and easy-to-use heatmap flutter chart package.
 
 Check example by run code `example/main.dart`
 
-<img src="./assets/readme/readme_01.gif" alt= “” width="200" height="466">
-<img src="./assets/readme/readme_02.gif" alt= “” width="200" height="466">
-<img src="./assets/readme/readme_03.gif" alt= “” width="200" height="466">
+<img src="https://user-images.githubusercontent.com/20661034/224278286-08dde6be-2e6d-4f9e-a732-07add1842c6c.gif" alt= “” width="200" height="466">
+<img src="https://user-images.githubusercontent.com/20661034/224278425-5ea1b21f-290c-44d1-8e92-e919ef1fc82e.gif" alt= “” width="200" height="466">
+<img src="https://user-images.githubusercontent.com/20661034/224278429-7cf7c8cb-2f55-4cae-b71a-cdbc1a4342be.gif" alt= “” width="200" height="466">
 
-<img src="./assets/readme/readme_04.gif" alt= “” width="200" height="466">
-<img src="./assets/readme/readme_05.gif" alt= “” width="200" height="466">
-<img src="./assets/readme/readme_06.gif" alt= “” width="200" height="466">
+<img src="https://user-images.githubusercontent.com/20661034/224278619-21b04340-2d74-48cc-a0c5-06c67f35cf47.gif" alt= “” width="200" height="466">
+<img src="https://user-images.githubusercontent.com/20661034/224278631-2855d819-f51e-451a-aaf1-b0e2d18507db.gif" alt= “” width="200" height="466">
+<img src="https://user-images.githubusercontent.com/20661034/224278416-37524f10-08b9-4c51-aa19-5e52f0d69e38.gif" alt= “” width="200" height="466">
 
 
 
