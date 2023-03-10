@@ -1,7 +1,7 @@
 name: simple_heatmap_calendar
 description: A new Flutter package project.
 version: 0.0.1
-homepage:
+homepage: https://github.com/FriesI23/simple_heatmap_calendar
 
 environment:
   sdk: '>=2.19.2 <3.0.0'
