@@ -253,6 +253,9 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   /// Distance between heatmap color tips
   final double colorTipCellBetweem;
 
+  /// Distance between color tip row and heatmap body
+  final double colorTipSpaceBetweenHeatmap;
+
   /// Displayed color tip number, color defined in `colorMap`,
   /// Select n colors uniformly from `colorMap`,
   /// if set num larger than `colorMap.length`, show num as `colorMap.length`
@@ -346,6 +349,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
     this.colorTipRightHelper,
     this.colorTipCellSize,
     this.colorTipCellBetweem = defualtCellSpaceBetween,
+    this.colorTipSpaceBetweenHeatmap = defualtCellSpaceBetween,
     this.layoutParameters = const HeatmapLayoutParameters.defaults(),
     this.switchParameters = const HeatmapSwitchParameters.defaults(),
     ScrollController? controller,
@@ -423,6 +427,8 @@ class _HeatmapCalendar<T extends Comparable<T>>
   double get colorTipCellBetweem => widget.colorTipCellBetweem;
 
   int get colorTipNum => widget.colorTipNum;
+
+  double get colorTipSpaceBetweenHeatmap => widget.colorTipSpaceBetweenHeatmap;
 
   bool get showCellText => widget.switchParameters.showCellText;
 
@@ -934,10 +940,22 @@ class _HeatmapCalendar<T extends Comparable<T>>
         }
       }
 
+      double topPadding = cellSpaceBetween, bottomPadding = cellSpaceBetween;
+      switch (colorTipLocation) {
+        case CalendarColorTipPosition.top:
+          bottomPadding = colorTipSpaceBetweenHeatmap;
+          break;
+        case CalendarColorTipPosition.bottom:
+          topPadding = colorTipSpaceBetweenHeatmap;
+          break;
+        default:
+          break;
+      }
+
       return Container(
         padding: EdgeInsets.only(
-          top: cellSpaceBetween,
-          bottom: cellSpaceBetween,
+          top: topPadding,
+          bottom: bottomPadding,
         ),
         width: widgetWidth,
         child: Row(

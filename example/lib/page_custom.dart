@@ -10,10 +10,12 @@ class _CustomProvider {
   double cellSize = 32.0;
   double cellSpaceBetween = 1.0;
   double weekLabelSpaceBetweenHeatmap = 5.0;
+  bool topColorTip = false;
   double colorTipCellSize = 24.0;
   bool useColorTipCellSize = false;
   double colorTipCellBetweem = 1.0;
   bool useColorTipCellBetweem = false;
+  double colorTipSpaceBetweenHeatmap = 5.0;
   double cellRadius = 1.0;
   bool showText = true;
   bool expandWeekLabel = true;
@@ -76,6 +78,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
       colorTipCellBetweem: data.useColorTipCellBetweem
           ? data.colorTipCellBetweem
           : data.cellSpaceBetween,
+      colorTipSpaceBetweenHeatmap: data.colorTipSpaceBetweenHeatmap,
       colorMap: {
         10: Colors.red.shade100,
         20: Colors.red.shade300,
@@ -89,10 +92,12 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
         39: Colors.yellow,
       },
       colorTipNum: 3,
-      layoutParameters: const HeatmapLayoutParameters.defaults(
+      layoutParameters: HeatmapLayoutParameters.defaults(
         monthLabelPosition: CalendarMonthLabelPosition.top,
         weekLabelPosition: CalendarWeekLabelPosition.right,
-        colorTipPosition: CalendarColorTipPosition.bottom,
+        colorTipPosition: data.topColorTip
+            ? CalendarColorTipPosition.top
+            : CalendarColorTipPosition.bottom,
       ),
       style: HeatmapCalendarStyle.defaults(
         colorTipPosOffset: 30,
@@ -371,6 +376,31 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           onChanged: (bool value) => setState(() {
             data.useColorTipCellBetweem = value;
           }),
+        ),
+        // topColorTip
+        SwitchListTile(
+          title: const Text("topColorTip"),
+          secondary: const Icon(Icons.architecture),
+          subtitle: Text(data.topColorTip.toString()),
+          value: data.topColorTip,
+          onChanged: (bool value) => setState(() {
+            data.topColorTip = value;
+          }),
+        ),
+        // colorTipSpaceBetweenHeatmap
+        ListTile(
+          title: const Text("colorTipSpaceBetweenHeatmap"),
+          leading: const Icon(Icons.crop_square),
+          subtitle: Slider(
+            value: data.colorTipSpaceBetweenHeatmap,
+            min: 0.0,
+            max: 40.0,
+            divisions: 20,
+            label: data.colorTipSpaceBetweenHeatmap.toStringAsFixed(2),
+            onChanged: (value) => setState(() {
+              data.colorTipSpaceBetweenHeatmap = value;
+            }),
+          ),
         ),
         // cellRadius
         ListTile(
