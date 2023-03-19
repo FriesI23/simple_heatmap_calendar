@@ -168,7 +168,14 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
             return Tooltip(
               message: "${DateFormat('yyyy-MM-dd').format(date)} value: $value",
               waitDuration: const Duration(seconds: 1),
-              child: childBuilder(context),
+              child: childBuilder(
+                context,
+                valueBuilder: (context, dateDay) {
+                  if (dateDay == null) return null;
+                  var n = vm.data[date];
+                  return Text((n ?? 0).toString());
+                },
+              ),
             );
           },
         );

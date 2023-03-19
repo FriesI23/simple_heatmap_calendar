@@ -25,10 +25,14 @@ class HeatmapCell<T> extends StatelessWidget {
   });
 
   Widget? _getValue(BuildContext context) {
-    if (value == null) return valueBuilder?.call(context, value);
-    var child = valueBuilder == null
-        ? Text(value.toString())
-        : valueBuilder!(context, value);
+    Widget? child;
+    if (value == null) {
+      child = valueBuilder?.call(context, value);
+    } else if (valueBuilder == null) {
+      child = Text(value.toString());
+    } else {
+      child = valueBuilder!(context, value);
+    }
     if (child == null) return null;
     return DefaultTextStyle(
       style: TextStyle(fontSize: valueSize, color: valueColor),

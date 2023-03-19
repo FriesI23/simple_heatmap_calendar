@@ -10,6 +10,8 @@ import 'heatmap_cell.dart';
 import 'heatmap_colortip.dart';
 import 'utils.dart';
 
+typedef ValueBuilder = Widget? Function(BuildContext context, int? dateDay);
+
 class HeatmapCalendarStyle {
   /// change heatmap cell container color
   final Color? cellBackgroundColor;
@@ -17,7 +19,7 @@ class HeatmapCalendarStyle {
   /// change heatmap cell radius
   final BorderRadius? cellRadius;
 
-  /// change heatmap cell value color, [HeatmapSwitchParameters.showText]
+  /// change heatmap cell value color, [HeatmapSwitchParameters.showCellText]
   /// must set true to display heatmap cell value;
   final Color? cellValueColor;
 
@@ -289,16 +291,23 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   /// e.g. (add tootips):
   /// ```dart
   /// cellBuilder: (context, childBuilder, columnIndex, rowIndex, date) {
-  ///   Tooltip(
-  ///     message: "${DateFormat('yyyy-MM-dd').format(date)}",
+  ///   return Tooltip(
+  ///     message: "${DateFormat('yyyy-MM-dd').format(date)} value: $value",
   ///     waitDuration: const Duration(seconds: 1),
-  ///     child: childBuilder(context),
+  ///     child: childBuilder(
+  ///       context,
+  ///       valueBuilder: (context, dateDay) {
+  ///         if (dateDay == null) return null;
+  ///         var n = vm.data[date];
+  ///         return Text((n ?? 0).toString());
+  ///       },
+  ///     ),
   ///   );
-  /// }
+  /// },
   /// ```
   final Widget Function(
     BuildContext context,
-    Widget Function(BuildContext) childBuilder,
+    Widget Function(BuildContext, {ValueBuilder? valueBuilder}) childBuilder,
     int columnIndex,
     int rowIndex,
     DateTime date,
@@ -673,9 +682,10 @@ class _HeatmapCalendar<T extends Comparable<T>>
     required int rowIndex,
     required DateTime date,
     required HeatmapCalendarStyle defaultStyle,
+    ValueBuilder? valueBuilder,
   }) {
     Color cellColor, valueColor;
-    int? value;
+    int? dateDay;
     EdgeInsets padding;
     bool isValidCell = true;
     if (date.isBefore(model.startDate) || date.isAfter(model.endedDate)) {
@@ -686,11 +696,12 @@ class _HeatmapCalendar<T extends Comparable<T>>
       cellColor = selectedColor ??
           userStyle?.cellBackgroundColor ??
           defaultStyle.cellBackgroundColor!;
-      value = showCellText ? date.day : null;
+      dateDay = showCellText ? date.day : null;
     }
     valueColor = getSelectedDateValueColor(date) ??
         userStyle?.cellValueColor ??
         defaultStyle.cellValueColor!;
+
     padding = getCellPadding(columnIndex, rowIndex);
 
     Widget cell = HeatmapCell<int>(
@@ -699,12 +710,19 @@ class _HeatmapCalendar<T extends Comparable<T>>
       color: cellColor,
       padding: userStyle?.cellValuePadding ?? defaultStyle.cellValuePadding,
       radius: userStyle?.cellRadius ?? defaultStyle.cellRadius,
-      value: value,
+      value: dateDay,
       valueColor: valueColor,
       valueBuilder: autoScaled
-          ? (context, value) =>
-              FittedBox(child: value != null ? Text(value.toString()) : null)
-          : null,
+          ? (context, value) => FittedBox(
+                child: value != null
+                    ? (valueBuilder != null
+                        ? valueBuilder(context, value)
+                        : Text(value.toString()))
+                    : (valueBuilder != null
+                        ? valueBuilder(context, value)
+                        : null),
+              )
+          : valueBuilder,
       valueSize: userStyle?.cellValueFontSize ?? defaultStyle.cellValueFontSize,
     );
 
@@ -846,12 +864,14 @@ class _HeatmapCalendar<T extends Comparable<T>>
           : columnIndex;
       var date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
 
-      Widget childBuilder(BuildContext context) => _cellBuilder(
+      Widget childBuilder(BuildContext context, {ValueBuilder? valueBuilder}) =>
+          _cellBuilder(
             context,
             date: date,
             columnIndex: columnIndex,
             rowIndex: rowIndex,
             defaultStyle: style,
+            valueBuilder: valueBuilder,
           );
 
       if (widget.cellBuilder != null) {

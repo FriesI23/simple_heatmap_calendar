@@ -109,9 +109,22 @@ class _BasicHeatmapPage extends State<BasicHeatmapPage> {
                     ),
                     monthLabelItemBuilder: (context, date, defaultFormat) =>
                         FittedBox(
+                      alignment: Alignment.centerLeft,
                       fit: BoxFit.scaleDown,
                       child: Text(DateFormat(defaultFormat).format(date)),
                     ),
+                    // cellBuilder:
+                    //     (context, childBuilder, columnIndex, rowIndex, date) =>
+                    //         childBuilder(
+                    //   context,
+                    //   valueBuilder: (context, dateDay) {
+                    //     if (dateDay == 1) {
+                    //       return const Icon(Icons.tonality);
+                    //     } else {
+                    //       return const Icon(Icons.circle_outlined);
+                    //     }
+                    //   },
+                    // ),
                   ),
                 ],
               ),
