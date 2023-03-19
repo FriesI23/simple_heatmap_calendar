@@ -1,6 +1,6 @@
 name: simple_heatmap_calendar
-description: A Powerful and easy-to-use heatmap flutter chart package
-version: 0.0.2
+description: A powerful and easy-to-use flutter heatmap calendar package
+version: 0.0.3
 homepage: https://github.com/FriesI23/simple_heatmap_calendar
 
 environment:
