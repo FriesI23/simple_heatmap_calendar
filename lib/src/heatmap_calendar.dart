@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'const.dart';
 import 'utils.dart';
 import 'widget/_cell.dart';
+import 'widget/cellitem.dart';
 import 'widget/colortip.dart';
 import 'widget/weeklabel.dart';
 
@@ -19,6 +20,8 @@ typedef WeekLabelValueBuilder = Widget? Function(
   DateTime protoDate,
   String defaultFormat,
 );
+
+typedef CellPressedCallback<T> = void Function(DateTime date, T? value)?;
 
 class HeatmapCalendarStyle {
   /// change heatmap cell container color
@@ -184,11 +187,11 @@ class HeatmapSwitchParameters {
 class HeatmapCallbackModel<T> {
   /// callback when heatmap cell clicked,
   /// `HeatmapSwitchParameters.tappable` must be `true``
-  final void Function(DateTime date, T? value)? onCellPressed;
+  final CellPressedCallback<T>? onCellPressed;
 
   /// callback when heatmap cell long clicked
   /// `HeatmapSwitchParameters.tappable` must be `true``
-  final void Function(DateTime date, T? value)? onCellLongPressed;
+  final CellPressedCallback<T>? onCellLongPressed;
 
   const HeatmapCallbackModel({
     this.onCellPressed,
@@ -668,86 +671,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
     super.dispose();
   }
 
-  Widget _cellBuilder(
-    BuildContext context, {
-    required int columnIndex,
-    required int rowIndex,
-    required DateTime date,
-    required HeatmapCalendarStyle defaultStyle,
-    ValueBuilder? valueBuilder,
-  }) {
-    Color cellColor, valueColor;
-    int? dateDay;
-    EdgeInsets padding;
-    bool isValidCell = true;
-    if (date.isBefore(model.startDate) || date.isAfter(model.endedDate)) {
-      cellColor = Colors.transparent;
-      isValidCell = false;
-    } else {
-      var selectedColor = getSelectedDateColor(date);
-      cellColor = selectedColor ??
-          userStyle?.cellBackgroundColor ??
-          defaultStyle.cellBackgroundColor!;
-      dateDay = showCellText ? date.day : null;
-    }
-    valueColor = getSelectedDateValueColor(date) ??
-        userStyle?.cellValueColor ??
-        defaultStyle.cellValueColor!;
-
-    padding = getCellPadding(columnIndex, rowIndex);
-
-    Widget cell = HeatmapCell<int>(
-      key: ValueKey(cellColor),
-      size: cellSize,
-      color: cellColor,
-      padding: userStyle?.cellValuePadding ?? defaultStyle.cellValuePadding,
-      radius: userStyle?.cellRadius ?? defaultStyle.cellRadius,
-      value: dateDay,
-      valueColor: valueColor,
-      valueBuilder: autoScaled
-          ? (context, value) => FittedBox(
-                child: value != null
-                    ? (valueBuilder != null
-                        ? valueBuilder(context, value)
-                        : Text(value.toString()))
-                    : (valueBuilder != null
-                        ? valueBuilder(context, value)
-                        : null),
-              )
-          : valueBuilder,
-      valueSize: userStyle?.cellValueFontSize ?? defaultStyle.cellValueFontSize,
-    );
-
-    cell = widget.cellChangeAnimateDuration != Duration.zero
-        ? AnimatedSwitcher(
-            duration: widget.cellChangeAnimateDuration,
-            switchInCurve: Curves.easeInQuint,
-            switchOutCurve: Curves.easeOutQuint,
-            transitionBuilder: widget.cellChangeAnimateTransitionBuilder ??
-                AnimatedSwitcher.defaultTransitionBuilder,
-            child: cell,
-          )
-        : cell;
-
-    if (tappable && isValidCell) {
-      cell = InkWell(
-        borderRadius: userStyle?.cellRadius ?? defaultStyle.cellRadius,
-        onTap: callbacks?.onCellPressed != null
-            ? () => callbacks!.onCellPressed!(date, selectedMap?[date])
-            : null,
-        onLongPress: callbacks?.onCellLongPressed != null
-            ? () => callbacks!.onCellLongPressed!(date, selectedMap?[date])
-            : null,
-        child: cell,
-      );
-    }
-
-    return Padding(
-      padding: padding,
-      child: cell,
-    );
-  }
-
   Widget _getMonthLabelItem(
       BuildContext context, DateTime date, HeatmapCalendarStyle style) {
     var formatter = date.month == 1 &&
@@ -824,27 +747,42 @@ class _HeatmapCalendar<T extends Comparable<T>>
           : columnIndex;
       var date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
 
-      Widget childBuilder(BuildContext context, {ValueBuilder? valueBuilder}) =>
-          _cellBuilder(
-            context,
-            date: date,
-            columnIndex: columnIndex,
-            rowIndex: rowIndex,
-            defaultStyle: style,
-            valueBuilder: valueBuilder,
-          );
-
-      if (widget.cellBuilder != null) {
-        return widget.cellBuilder!(
-          context,
-          childBuilder,
-          columnIndex,
-          rowIndex,
-          date,
+      Widget buildItem(BuildContext context, {ValueBuilder? valueBuilder}) {
+        var value = selectedMap?[date];
+        return HeatmapCellItem<T>(
+          model: model,
+          date: date,
+          value: value,
+          cellSize: cellSize,
+          cellPadding: getCellPadding(columnIndex, rowIndex),
+          cellRadius: userStyle?.cellRadius ?? style.cellRadius,
+          cellValueSize:
+              userStyle?.cellValueFontSize ?? style.cellValueFontSize,
+          cellValuePadding:
+              userStyle?.cellValuePadding ?? style.cellValuePadding,
+          showCellText: showCellText,
+          autoScaled: autoScaled,
+          tappable: tappable,
+          cellChangeAnimateDuration: widget.cellChangeAnimateDuration,
+          cellChangeAnimateTransitionBuilder:
+              widget.cellChangeAnimateTransitionBuilder,
+          getSelectedDateColor: (date) =>
+              getSelectedDateColor(date) ??
+              userStyle?.cellBackgroundColor ??
+              style.cellBackgroundColor!,
+          getSelectedDateValueColor: (date) =>
+              getSelectedDateValueColor(date) ??
+              userStyle?.cellValueColor ??
+              style.cellValueColor!,
+          onCellPressed: callbacks?.onCellPressed,
+          onCellLongPressed: callbacks?.onCellLongPressed,
+          valueBuilder: valueBuilder,
         );
-      } else {
-        return childBuilder(context);
       }
+
+      return widget.cellBuilder
+              ?.call(context, buildItem, columnIndex, rowIndex, date) ??
+          buildItem(context);
     }
 
     Widget buildHeatmapWeekLabels(BuildContext context) {
