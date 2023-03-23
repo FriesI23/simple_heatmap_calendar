@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../const.dart';
 import '../heatmap_calendar.dart';
 import '../utils.dart';
 import '_cell.dart';
@@ -177,5 +178,97 @@ class HeatmapCellItem<T extends Comparable<T>> extends StatelessWidget {
             child: buildCell(context),
           )
         : buildCell(context);
+  }
+}
+
+class HeatmapCellItemColumn<T extends Comparable<T>> extends StatelessWidget {
+  final HeatmapCalendarLocationCalclator model;
+  final int columnIndex;
+  final CalendarWeekLabelPosition? weekLabelLocation;
+  final Size? cellSize;
+  final BorderRadius? cellRadius;
+  final double? cellValueSize;
+  final EdgeInsetsGeometry? cellValuePadding;
+  final bool showCellText;
+  final bool autoScaled;
+  final bool tappable;
+  final Duration cellChangeAnimateDuration;
+  final AnimatedSwitcherTransitionBuilder? cellChangeAnimateTransitionBuilder;
+  final Color? Function(DateTime date)? getSelectedDateColor;
+  final Color? Function(DateTime date)? getSelectedDateValueColor;
+  final CellPressedCallback<T>? onCellPressed;
+  final CellPressedCallback<T>? onCellLongPressed;
+  final T? Function(DateTime date)? getValue;
+  final EdgeInsetsGeometry Function(int columnIndex, int rowIndex)?
+      getCellPadding;
+  final CellItemBuilder? cellItemBuilder;
+
+  const HeatmapCellItemColumn({
+    super.key,
+    required this.model,
+    required this.columnIndex,
+    this.weekLabelLocation,
+    this.cellSize,
+    this.cellRadius,
+    this.cellValueSize,
+    this.cellValuePadding,
+    required this.showCellText,
+    required this.autoScaled,
+    required this.tappable,
+    required this.cellChangeAnimateDuration,
+    this.cellChangeAnimateTransitionBuilder,
+    this.getSelectedDateColor,
+    this.getSelectedDateValueColor,
+    this.onCellPressed,
+    this.onCellLongPressed,
+    this.getValue,
+    this.getCellPadding,
+    this.cellItemBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: List<Widget>.generate(
+        maxDayOfWeek,
+        (rowIndex) {
+          var dateColumnIndex =
+              weekLabelLocation == CalendarWeekLabelPosition.left
+                  ? columnIndex - 1
+                  : columnIndex;
+          var date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
+
+          Widget buildItem(BuildContext context, {ValueBuilder? valueBuilder}) {
+            return HeatmapCellItem<T>(
+              model: model,
+              date: date,
+              value: getValue?.call(date),
+              cellSize: cellSize,
+              cellPadding: getCellPadding?.call(columnIndex, rowIndex) ??
+                  EdgeInsets.zero,
+              cellRadius: cellRadius,
+              cellValueSize: cellValueSize,
+              cellValuePadding: cellValuePadding,
+              showCellText: showCellText,
+              autoScaled: autoScaled,
+              tappable: tappable,
+              cellChangeAnimateDuration: cellChangeAnimateDuration,
+              cellChangeAnimateTransitionBuilder:
+                  cellChangeAnimateTransitionBuilder,
+              getSelectedDateColor: getSelectedDateColor,
+              getSelectedDateValueColor: getSelectedDateValueColor,
+              onCellPressed: onCellPressed,
+              onCellLongPressed: onCellLongPressed,
+              valueBuilder: valueBuilder,
+            );
+          }
+
+          return cellItemBuilder?.call(
+                  context, buildItem, columnIndex, rowIndex, date) ??
+              buildItem(context);
+        },
+      ),
+    );
   }
 }

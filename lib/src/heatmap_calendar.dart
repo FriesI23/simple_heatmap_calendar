@@ -27,6 +27,14 @@ typedef MonthLabelValueBuilder = Widget? Function(
   String defaultFormat,
 );
 
+typedef CellItemBuilder = Widget? Function(
+  BuildContext context,
+  Widget Function(BuildContext, {ValueBuilder? valueBuilder}) childBuilder,
+  int columnIndex,
+  int rowIndex,
+  DateTime date,
+);
+
 typedef CellPressedCallback<T> = void Function(DateTime date, T? value)?;
 
 class HeatmapCalendarStyle {
@@ -322,13 +330,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///   );
   /// },
   /// ```
-  final Widget Function(
-    BuildContext context,
-    Widget Function(BuildContext, {ValueBuilder? valueBuilder}) childBuilder,
-    int columnIndex,
-    int rowIndex,
-    DateTime date,
-  )? cellBuilder;
+  final CellItemBuilder? cellBuilder;
 
   /// Customn month label builder
   /// e.g.
@@ -674,51 +676,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
   Widget build(BuildContext context) {
     var style = _getDefaultStyle(context);
 
-    Widget buildHeatmapCell(
-        BuildContext context, int columnIndex, int rowIndex) {
-      var dateColumnIndex = weekLabelLocation == CalendarWeekLabelPosition.left
-          ? columnIndex - 1
-          : columnIndex;
-      var date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
-
-      Widget buildItem(BuildContext context, {ValueBuilder? valueBuilder}) {
-        var value = selectedMap?[date];
-        return HeatmapCellItem<T>(
-          model: model,
-          date: date,
-          value: value,
-          cellSize: cellSize,
-          cellPadding: getCellPadding(columnIndex, rowIndex),
-          cellRadius: userStyle?.cellRadius ?? style.cellRadius,
-          cellValueSize:
-              userStyle?.cellValueFontSize ?? style.cellValueFontSize,
-          cellValuePadding:
-              userStyle?.cellValuePadding ?? style.cellValuePadding,
-          showCellText: showCellText,
-          autoScaled: autoScaled,
-          tappable: tappable,
-          cellChangeAnimateDuration: widget.cellChangeAnimateDuration,
-          cellChangeAnimateTransitionBuilder:
-              widget.cellChangeAnimateTransitionBuilder,
-          getSelectedDateColor: (date) =>
-              getSelectedDateColor(date) ??
-              userStyle?.cellBackgroundColor ??
-              style.cellBackgroundColor!,
-          getSelectedDateValueColor: (date) =>
-              getSelectedDateValueColor(date) ??
-              userStyle?.cellValueColor ??
-              style.cellValueColor!,
-          onCellPressed: callbacks?.onCellPressed,
-          onCellLongPressed: callbacks?.onCellLongPressed,
-          valueBuilder: valueBuilder,
-        );
-      }
-
-      return widget.cellBuilder
-              ?.call(context, buildItem, columnIndex, rowIndex, date) ??
-          buildItem(context);
-    }
-
     Widget buildHeatmap(BuildContext context) {
       var needBuildFromEnd = defaultLocation == CalendarScrollPosition.ended;
       var itemMaxIndex = model.offsetColumnWithEndDate;
@@ -749,12 +706,36 @@ class _HeatmapCalendar<T extends Comparable<T>>
             );
           }
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: List<Widget>.generate(
-              maxDayOfWeek,
-              (rowIndex) => buildHeatmapCell(context, columnIndex, rowIndex),
-            ),
+          return HeatmapCellItemColumn<T>(
+            model: model,
+            columnIndex: columnIndex,
+            weekLabelLocation: weekLabelLocation,
+            cellSize: cellSize,
+            cellRadius: userStyle?.cellRadius ?? style.cellRadius,
+            cellValueSize:
+                userStyle?.cellValueFontSize ?? style.cellValueFontSize,
+            cellValuePadding:
+                userStyle?.cellValuePadding ?? style.cellValuePadding,
+            showCellText: showCellText,
+            autoScaled: autoScaled,
+            tappable: tappable,
+            cellChangeAnimateDuration: widget.cellChangeAnimateDuration,
+            cellChangeAnimateTransitionBuilder:
+                widget.cellChangeAnimateTransitionBuilder,
+            getSelectedDateColor: (date) =>
+                getSelectedDateColor(date) ??
+                userStyle?.cellBackgroundColor ??
+                style.cellBackgroundColor!,
+            getSelectedDateValueColor: (date) =>
+                getSelectedDateValueColor(date) ??
+                userStyle?.cellValueColor ??
+                style.cellValueColor!,
+            onCellPressed: callbacks?.onCellPressed,
+            onCellLongPressed: callbacks?.onCellLongPressed,
+            getValue: (date) => selectedMap?[date],
+            getCellPadding: (columnIndex, rowIndex) =>
+                getCellPadding(columnIndex, rowIndex),
+            cellItemBuilder: widget.cellBuilder,
           );
         },
         reverse: needBuildFromEnd,
@@ -898,7 +879,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
           var size =
               (constraints.maxWidth - (columnCount - 1) * cellSpaceBetween) /
                   columnCount;
-          debugPrint(size.toString());
           _overlayCellSize = Size.square(math.max(0.1, size));
           return buildFrame(context);
         },
