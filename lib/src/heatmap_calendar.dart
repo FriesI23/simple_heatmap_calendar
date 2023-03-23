@@ -8,9 +8,16 @@ import 'package:intl/intl.dart';
 import 'const.dart';
 import 'heatmap_cell.dart';
 import 'heatmap_colortip.dart';
+import 'heatmap_weeklabel.dart';
 import 'utils.dart';
 
 typedef ValueBuilder = Widget? Function(BuildContext context, int? dateDay);
+
+typedef WeekLabelValueBuilder = Widget? Function(
+  BuildContext context,
+  DateTime protoDate,
+  String defaultFormat,
+);
 
 class HeatmapCalendarStyle {
   /// change heatmap cell container color
@@ -333,11 +340,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///   Text(DateFormat('cccc', myLocale).format(protoDate));
   /// }
   /// ```
-  final Widget Function(
-    BuildContext context,
-    DateTime protoDate,
-    String defaultFormat,
-  )? weekLabelValueBuilder;
+  final WeekLabelValueBuilder? weekLabelValueBuilder;
 
   const HeatmapCalendar({
     super.key,
@@ -551,18 +554,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
     );
   }
 
-  EdgeInsets getWeekLabelPadding(int rowIndex) {
-    return EdgeInsets.only(
-      left: weekLabelLocation == CalendarWeekLabelPosition.left
-          ? 0.0
-          : weekLabelSpaceBetweenHeatmap,
-      right: weekLabelLocation == CalendarWeekLabelPosition.right
-          ? 0.0
-          : weekLabelSpaceBetweenHeatmap,
-      top: rowIndex == 0 ? 0.0 : cellSpaceBetween,
-    );
-  }
-
   Iterable<Color> getSampleColorsFromColorMap({bool reverse = false}) {
     var keyList = <T>[];
     if (colorTipNum > colorMap.length) {
@@ -756,38 +747,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
     );
   }
 
-  Widget _getWeekLabelItem(
-      BuildContext context, int rowIndex, HeatmapCalendarStyle defaultStyle) {
-    var date = model.getProtoDateByOffsetRow(rowIndex);
-    var formatter = 'ccccc';
-
-    Widget? valueBuilder(BuildContext context, String? value) {
-      if (widget.weekLabelValueBuilder != null) {
-        return widget.weekLabelValueBuilder!(context, date, formatter);
-      }
-      if (value == null) return null;
-      if (autoScaled) return FittedBox(child: Text(value));
-      return Text(value);
-    }
-
-    return Padding(
-      padding: getWeekLabelPadding(rowIndex),
-      child: HeatmapCell<String>(
-        size: weekLabelCellSize,
-        color: Colors.transparent,
-        value: DateFormat(formatter, localeName).format(date),
-        valueColor: userStyle?.weekLabelColor ?? defaultStyle.weekLabelColor,
-        valueAlignment: userStyle?.weekLabelValueAlignment ??
-            defaultStyle.weekLabelValueAlignment,
-        valueBuilder: widget.weekLabelValueBuilder == null && !autoScaled
-            ? null
-            : valueBuilder,
-        valueSize: userStyle?.weekLabelValueFontSize ??
-            defaultStyle.weekLabelValueFontSize,
-      ),
-    );
-  }
-
   Widget _getMonthLabelItem(
       BuildContext context, DateTime date, HeatmapCalendarStyle style) {
     var formatter = date.month == 1 &&
@@ -888,12 +847,20 @@ class _HeatmapCalendar<T extends Comparable<T>>
     }
 
     Widget buildHeatmapWeekLabels(BuildContext context) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: List<Widget>.generate(
-          _maxDayOfWeek,
-          (rowIndex) => _getWeekLabelItem(context, rowIndex, style),
-        ),
+      return WeekLabelColumn(
+        model: model,
+        format: DateFormat(defaultWeekLabelDateFormatter, localeName),
+        valueColor: userStyle?.weekLabelColor ?? style.weekLabelColor,
+        valueAlignment:
+            userStyle?.weekLabelValueAlignment ?? style.weekLabelValueAlignment,
+        valueSize:
+            userStyle?.weekLabelValueFontSize ?? style.weekLabelValueFontSize,
+        cellSize: weekLabelCellSize,
+        cellSpaceBetween: cellSpaceBetween,
+        autoScaled: autoScaled,
+        weekLabelLocation: weekLabelLocation,
+        weekLabelSpaceBetweenHeatmap: weekLabelSpaceBetweenHeatmap,
+        weekLabelValueBuilder: widget.weekLabelValueBuilder,
       );
     }
 
