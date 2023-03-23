@@ -628,6 +628,13 @@ class _HeatmapCalendar<T extends Comparable<T>>
     }
   }
 
+  void syncScrollPostionListener() {
+    if (calendarLabelLocation != null &&
+        controller.position.pixels != _labelController.position.pixels) {
+      _labelController.jumpTo(controller.position.pixels);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -646,13 +653,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
     );
     controller = widget._controller ?? ScrollController();
     _labelController = ScrollController();
-    if (calendarLabelLocation != null) {
-      controller.addListener(() {
-        if (controller.position.pixels != _labelController.position.pixels) {
-          _labelController.jumpTo(controller.position.pixels);
-        }
-      });
-    }
+    controller.addListener(syncScrollPostionListener);
     // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
     //   switch (defaultLocation) {
     //     case CalendarScrollPosition.start:
