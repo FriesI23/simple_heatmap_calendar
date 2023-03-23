@@ -8,9 +8,9 @@ import 'package:intl/intl.dart';
 
 import 'const.dart';
 import 'utils.dart';
-import 'widget/_cell.dart';
 import 'widget/cellitem.dart';
 import 'widget/colortip.dart';
+import 'widget/monthlabel.dart';
 import 'widget/weeklabel.dart';
 
 typedef ValueBuilder = Widget? Function(BuildContext context, int? dateDay);
@@ -18,6 +18,12 @@ typedef ValueBuilder = Widget? Function(BuildContext context, int? dateDay);
 typedef WeekLabelValueBuilder = Widget? Function(
   BuildContext context,
   DateTime protoDate,
+  String defaultFormat,
+);
+
+typedef MonthLabelValueBuilder = Widget? Function(
+  BuildContext context,
+  DateTime date,
   String defaultFormat,
 );
 
@@ -331,11 +337,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///   return Text(DateFormat(DateFormat.YEAR_MONTH).format(data));
   /// }
   /// ```
-  final Widget Function(
-    BuildContext context,
-    DateTime date,
-    String defaultFormat,
-  )? monthLabelItemBuilder;
+  final MonthLabelValueBuilder? monthLabelItemBuilder;
 
   /// Custom week label builder
   /// e.g.
@@ -388,9 +390,6 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
 
 class _HeatmapCalendar<T extends Comparable<T>>
     extends State<HeatmapCalendar<T>> {
-  static const _maxDayOfWeek = DateTime.sunday;
-  static const _labelTextSizeMultiple = 3;
-
   late SplayTreeMap<T, Color> colorMap;
   late SplayTreeMap<T, Color> valueColorMap;
   late HeatmapCalendarLocationCalclator _model;
@@ -468,7 +467,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
   Size get cellSize => _overlayCellSize ?? widget.cellSize;
 
   double get heatmapHeight =>
-      _maxDayOfWeek * cellSize.height + (_maxDayOfWeek - 1) * cellSpaceBetween;
+      maxDayOfWeek * cellSize.height + (maxDayOfWeek - 1) * cellSpaceBetween;
 
   double get heatmapWidth {
     var columnCount = model.offsetColumnWithEndDate + 1;
@@ -671,71 +670,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
     super.dispose();
   }
 
-  Widget _getMonthLabelItem(
-      BuildContext context, DateTime date, HeatmapCalendarStyle style) {
-    var formatter = date.month == 1 &&
-            (userStyle?.showYearOnMonthLabel ?? style.showYearOnMonthLabel)
-        ? "yMMM"
-        : "MMM";
-    return DefaultTextStyle(
-      style: TextStyle(
-        color: userStyle?.monthLabelColor ?? style.monthLabelColor,
-        fontSize: userStyle?.monthLabelFontSize ?? style.monthLabelFontSize,
-      ),
-      child: widget.monthLabelItemBuilder?.call(context, date, formatter) ??
-          Text(DateFormat(formatter, localeName).format(date)),
-    );
-  }
-
-  Widget _monthLabelBuilder(BuildContext context) {
-    var style = _getDefaultStyle(context);
-    var dateMap = <int, DateTime>{};
-    if (model.startDate.day == 1) {
-      dateMap[model.getOffsetColumn(model.startDate)] = model.startDate;
-    }
-    var tmpDate = model.startDate;
-    while (tmpDate.isBefore(model.endedDate)) {
-      tmpDate = DateTime(tmpDate.year, tmpDate.month + 1, 1);
-      dateMap[model.getOffsetColumn(tmpDate)] = tmpDate;
-    }
-
-    var children = <Widget>[];
-    var columns = model.offsetColumnWithEndDate + 1;
-
-    var columnIndex = 0;
-    var maxColumnIndex = model.offsetColumnWithEndDate;
-    while (columnIndex < maxColumnIndex) {
-      var padding = getCellPadding(columnIndex, 0);
-      if (dateMap.containsKey(columnIndex) &&
-          (columns - columnIndex) >= _labelTextSizeMultiple) {
-        var date = dateMap[columnIndex]!;
-        children.add(
-          Padding(
-            padding: padding,
-            child: SizedBox(
-              width: cellSize.width * _labelTextSizeMultiple +
-                  padding.left * (_labelTextSizeMultiple - 1),
-              child: _getMonthLabelItem(context, date, style),
-            ),
-          ),
-        );
-        columnIndex += _labelTextSizeMultiple;
-      } else {
-        children.add(
-          Padding(
-            padding: padding,
-            child: ConstrainedBox(
-              constraints: BoxConstraints.tightFor(width: cellSize.width),
-            ),
-          ),
-        );
-        columnIndex += 1;
-      }
-    }
-
-    return Row(children: children);
-  }
-
   @override
   Widget build(BuildContext context) {
     var style = _getDefaultStyle(context);
@@ -785,24 +719,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
           buildItem(context);
     }
 
-    Widget buildHeatmapWeekLabels(BuildContext context) {
-      return WeekLabelColumn(
-        model: model,
-        format: DateFormat(defaultWeekLabelDateFormatter, localeName),
-        valueColor: userStyle?.weekLabelColor ?? style.weekLabelColor,
-        valueAlignment:
-            userStyle?.weekLabelValueAlignment ?? style.weekLabelValueAlignment,
-        valueSize:
-            userStyle?.weekLabelValueFontSize ?? style.weekLabelValueFontSize,
-        cellSize: weekLabelCellSize,
-        cellSpaceBetween: cellSpaceBetween,
-        autoScaled: autoScaled,
-        weekLabelLocation: weekLabelLocation,
-        weekLabelSpaceBetweenHeatmap: weekLabelSpaceBetweenHeatmap,
-        weekLabelValueBuilder: widget.weekLabelValueBuilder,
-      );
-    }
-
     Widget buildHeatmap(BuildContext context) {
       var needBuildFromEnd = defaultLocation == CalendarScrollPosition.ended;
       var itemMaxIndex = model.offsetColumnWithEndDate;
@@ -816,13 +732,27 @@ class _HeatmapCalendar<T extends Comparable<T>>
                   weekLabelLocation == CalendarWeekLabelPosition.left) ||
               (columnIndex == itemMaxIndex &&
                   weekLabelLocation == CalendarWeekLabelPosition.right)) {
-            return buildHeatmapWeekLabels(context);
+            return WeekLabelColumn(
+              model: model,
+              format: DateFormat(defaultWeekLabelDateFormatter, localeName),
+              valueColor: userStyle?.weekLabelColor ?? style.weekLabelColor,
+              valueAlignment: userStyle?.weekLabelValueAlignment ??
+                  style.weekLabelValueAlignment,
+              valueSize: userStyle?.weekLabelValueFontSize ??
+                  style.weekLabelValueFontSize,
+              cellSize: weekLabelCellSize,
+              cellSpaceBetween: cellSpaceBetween,
+              autoScaled: autoScaled,
+              weekLabelLocation: weekLabelLocation,
+              weekLabelSpaceBetweenHeatmap: weekLabelSpaceBetweenHeatmap,
+              weekLabelValueBuilder: widget.weekLabelValueBuilder,
+            );
           }
 
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: List<Widget>.generate(
-              _maxDayOfWeek,
+              maxDayOfWeek,
               (rowIndex) => buildHeatmapCell(context, columnIndex, rowIndex),
             ),
           );
@@ -843,7 +773,24 @@ class _HeatmapCalendar<T extends Comparable<T>>
         physics: const NeverScrollableScrollPhysics(),
         child: SizedBox(
           width: widgetWidth,
-          child: _monthLabelBuilder(context),
+          child: MonthLabelRow(
+            model: model,
+            cellSize: cellSize,
+            monthLabelColor:
+                userStyle?.monthLabelColor ?? style.monthLabelColor,
+            monthLabelFontSize:
+                userStyle?.monthLabelFontSize ?? style.monthLabelFontSize,
+            getFormat: (date) {
+              var formatter = date.month == 1 &&
+                      (userStyle?.showYearOnMonthLabel ??
+                          style.showYearOnMonthLabel)
+                  ? "yMMM"
+                  : "MMM";
+              return DateFormat(formatter, localeName);
+            },
+            getCellPadding: (columnIndex) => getCellPadding(columnIndex, 0),
+            monthLabelItemBuilder: widget.monthLabelItemBuilder,
+          ),
         ),
       );
     }
@@ -968,9 +915,9 @@ class _HeatmapCalendar<T extends Comparable<T>>
           switch (autoClippedBasis) {
             case CalendarAutoChippedBasis.left:
               var newEndedDate = _model.startDate.add(Duration(
-                  days: (_maxDayOfWeek - 1) -
+                  days: (maxDayOfWeek - 1) -
                       _model.offsetRowWithStartDate +
-                      (clippedHeatmapColumn - 1) * _maxDayOfWeek));
+                      (clippedHeatmapColumn - 1) * maxDayOfWeek));
               if (newEndedDate.isBefore(_model.endedDate)) {
                 _clippedModel = _model.copyWith(endedDate: newEndedDate);
               } else {
@@ -980,7 +927,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
             case CalendarAutoChippedBasis.right:
               var newStartDate = _model.endedDate.subtract(Duration(
                   days: _model.offsetRowWithEndDate +
-                      (clippedHeatmapColumn - 1) * _maxDayOfWeek));
+                      (clippedHeatmapColumn - 1) * maxDayOfWeek));
               if (newStartDate.isAfter(_model.startDate)) {
                 _clippedModel = _model.copyWith(startDate: newStartDate);
               } else {

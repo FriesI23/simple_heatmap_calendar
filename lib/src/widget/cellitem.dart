@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 
 import '../heatmap_calendar.dart';
@@ -21,7 +19,6 @@ class _HeatmapCellItem extends StatelessWidget {
   final bool autoScaled;
   final GestureTapCallback? onCellPressed;
   final GestureLongPressCallback? onCellLongPressed;
-  final GestureTapCallback? onCellDoublePressed;
   final ValueBuilder? valueBuilder;
 
   const _HeatmapCellItem({
@@ -40,7 +37,6 @@ class _HeatmapCellItem extends StatelessWidget {
     required this.autoScaled,
     this.onCellPressed,
     this.onCellLongPressed,
-    this.onCellDoublePressed,
     this.valueBuilder,
   });
 
@@ -73,7 +69,6 @@ class _HeatmapCellItem extends StatelessWidget {
         borderRadius: cellRadius,
         onTap: onCellPressed,
         onLongPress: onCellLongPressed,
-        onDoubleTap: onCellDoublePressed,
         child: cell,
       );
     }

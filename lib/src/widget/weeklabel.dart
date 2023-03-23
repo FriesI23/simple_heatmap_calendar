@@ -15,7 +15,6 @@ class WeekLabelItem extends StatelessWidget {
   final Color? valueColor;
   final Alignment? valueAlignment;
   final double? valueSize;
-  final HeatmapCalendarLocationCalclator model;
   final EdgeInsetsGeometry padding;
   final Size? cellSize;
   final bool autoScaled;
@@ -29,7 +28,6 @@ class WeekLabelItem extends StatelessWidget {
     this.valueColor,
     this.valueAlignment,
     this.valueSize,
-    required this.model,
     required this.padding,
     this.cellSize,
     required this.autoScaled,
@@ -118,7 +116,6 @@ class WeekLabelColumn extends StatelessWidget {
             valueColor: valueColor,
             valueAlignment: valueAlignment,
             valueSize: valueSize,
-            model: model,
             padding: getWeekLabelPadding(rowIndex),
             cellSize: cellSize,
             autoScaled: autoScaled,
