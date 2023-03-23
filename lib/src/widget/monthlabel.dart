@@ -48,7 +48,10 @@ class MonthLabelItem extends StatelessWidget {
 
 class MonthLabelRow extends StatelessWidget {
   final HeatmapCalendarLocationCalclator model;
+  final double? offset;
+  final CalendarWeekLabelPosition? weekLabelLocation;
   final Size cellSize;
+  final double cellSpaceBetween;
   final Color? monthLabelColor;
   final double? monthLabelFontSize;
   final int labelTextSizeMultiple;
@@ -58,8 +61,11 @@ class MonthLabelRow extends StatelessWidget {
 
   const MonthLabelRow({
     super.key,
+    this.offset,
+    this.weekLabelLocation,
     required this.model,
     required this.cellSize,
+    this.cellSpaceBetween = 0,
     this.monthLabelColor,
     this.monthLabelFontSize,
     this.labelTextSizeMultiple = 3,
@@ -83,9 +89,15 @@ class MonthLabelRow extends StatelessWidget {
     var children = <Widget>[];
     var columns = model.offsetColumnWithEndDate + 1;
 
+    if (offset != null &&
+        offset! > 0 &&
+        weekLabelLocation == CalendarWeekLabelPosition.left) {
+      children.add(SizedBox(width: offset!));
+    }
+
     var columnIndex = 0;
     var maxColumnIndex = model.offsetColumnWithEndDate;
-    while (columnIndex < maxColumnIndex) {
+    while (columnIndex <= maxColumnIndex) {
       var cellPadding = getCellPadding?.call(columnIndex) ?? EdgeInsets.zero;
       if (dateMap.containsKey(columnIndex) &&
           (columns - columnIndex) >= labelTextSizeMultiple) {
@@ -97,7 +109,7 @@ class MonthLabelRow extends StatelessWidget {
           monthLabelFontSize: monthLabelFontSize,
           padding: cellPadding,
           innderWidth: cellSize.width * labelTextSizeMultiple +
-              cellPadding.left * (labelTextSizeMultiple - 1),
+              cellSpaceBetween * (labelTextSizeMultiple - 1),
           format: format,
           monthLabelItemBuilder: monthLabelItemBuilder,
         ));
@@ -113,6 +125,16 @@ class MonthLabelRow extends StatelessWidget {
         );
         columnIndex += 1;
       }
+
+      if (columnIndex < maxColumnIndex) {
+        children.add(SizedBox(width: cellSpaceBetween));
+      }
+    }
+
+    if (offset != null &&
+        offset! > 0 &&
+        weekLabelLocation == CalendarWeekLabelPosition.right) {
+      children.add(SizedBox(width: offset));
     }
 
     return Row(children: children);

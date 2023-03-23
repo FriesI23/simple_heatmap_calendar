@@ -554,7 +554,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
 
   EdgeInsets getCellPadding(int columnIndex, int rowIndex) {
     return EdgeInsets.only(
-      left: columnIndex == 0 ? 0.0 : cellSpaceBetween,
+      // left: columnIndex == 0 ? 0.0 : cellSpaceBetween,
       top: rowIndex == 0 ? 0.0 : cellSpaceBetween,
     );
   }
@@ -791,7 +791,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
     var itemMaxIndex = model.offsetColumnWithEndDate;
     if (weekLabelLocation != null) itemMaxIndex += 1;
 
-    return ListView.builder(
+    return ListView.separated(
       itemBuilder: (context, columnIndex) {
         if (needBuildFromEnd) columnIndex = itemMaxIndex - columnIndex;
 
@@ -848,6 +848,13 @@ class _HeatmapCalendar<T extends Comparable<T>>
           cellItemBuilder: widget.cellBuilder,
         );
       },
+      separatorBuilder: (context, index) {
+        if (index == 0 || index >= itemMaxIndex) {
+          return const SizedBox();
+        }
+
+        return SizedBox(width: cellSpaceBetween);
+      },
       reverse: needBuildFromEnd,
       itemCount: itemMaxIndex + 1,
       scrollDirection: Axis.horizontal,
@@ -866,7 +873,10 @@ class _HeatmapCalendar<T extends Comparable<T>>
         width: widgetWidth,
         child: MonthLabelRow(
           model: model,
+          offset: weekLabelWidth,
+          weekLabelLocation: weekLabelLocation,
           cellSize: cellSize,
+          cellSpaceBetween: cellSpaceBetween,
           monthLabelColor: userStyle?.monthLabelColor ?? style.monthLabelColor,
           monthLabelFontSize:
               userStyle?.monthLabelFontSize ?? style.monthLabelFontSize,
