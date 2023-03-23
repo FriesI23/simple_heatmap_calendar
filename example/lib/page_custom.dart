@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
@@ -22,6 +23,10 @@ class _CustomProvider {
   bool expandMonthLabel = false;
   double monthLabelFontSize = 0.0;
   CalendarAutoChippedBasis? autoClip;
+  CalendarWeekLabelPosition? weekLabelPosition =
+      CalendarWeekLabelPosition.right;
+  CalendarMonthLabelPosition? monthLabelPosition =
+      CalendarMonthLabelPosition.top;
 
   Size? get expandWeekLabelSize =>
       expandWeekLabel ? Size(cellSize * 3, cellSize) : null;
@@ -93,8 +98,8 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
       },
       colorTipNum: 3,
       layoutParameters: HeatmapLayoutParameters.defaults(
-        monthLabelPosition: CalendarMonthLabelPosition.top,
-        weekLabelPosition: CalendarWeekLabelPosition.right,
+        monthLabelPosition: data.monthLabelPosition,
+        weekLabelPosition: data.weekLabelPosition,
         colorTipPosition: data.topColorTip
             ? CalendarColorTipPosition.top
             : CalendarColorTipPosition.bottom,
@@ -139,6 +144,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
     var data = context.read<_CustomProvider>();
     return ListView(
       children: [
+        const SizedBox(height: 20),
         // scroll
         Wrap(
           direction: Axis.horizontal,
@@ -197,6 +203,59 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
               },
               icon: const Icon(Icons.arrow_right),
               label: const Text("to start"),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        // options2
+        Wrap(
+          direction: Axis.horizontal,
+          alignment: WrapAlignment.spaceAround,
+          children: [
+            OutlinedButton(
+              onPressed: () {
+                switch (data.weekLabelPosition) {
+                  case CalendarWeekLabelPosition.left:
+                    setState(() {
+                      data.weekLabelPosition = null;
+                    });
+                    break;
+                  case CalendarWeekLabelPosition.right:
+                    setState(() {
+                      data.weekLabelPosition = CalendarWeekLabelPosition.left;
+                    });
+                    break;
+                  default:
+                    setState(() {
+                      data.weekLabelPosition = CalendarWeekLabelPosition.right;
+                    });
+                    break;
+                }
+              },
+              child: const Text("chagne weekLabel pos"),
+            ),
+            OutlinedButton(
+              onPressed: () {
+                switch (data.monthLabelPosition) {
+                  case CalendarMonthLabelPosition.top:
+                    setState(() {
+                      data.monthLabelPosition = null;
+                    });
+                    break;
+                  case CalendarMonthLabelPosition.bottom:
+                    setState(() {
+                      data.monthLabelPosition = CalendarMonthLabelPosition.top;
+                    });
+                    break;
+                  default:
+                    setState(() {
+                      data.monthLabelPosition =
+                          CalendarMonthLabelPosition.bottom;
+                    });
+                    break;
+                }
+              },
+              child: const Text("chagne monthLabel pos"),
             ),
           ],
         ),
@@ -457,6 +516,16 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
       builder: (context, child) => Scaffold(
         appBar: AppBar(
           title: const Text("Custom page"),
+          actions: [
+            IconButton(
+              onPressed: () {
+                setState(() {
+                  debugPaintSizeEnabled = !debugPaintSizeEnabled;
+                });
+              },
+              icon: const Icon(Icons.view_agenda),
+            ),
+          ],
         ),
         body: Column(
           children: [

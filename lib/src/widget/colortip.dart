@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'const.dart';
-import 'heatmap_cell.dart';
+import '../const.dart';
+
+import '_cell.dart';
 
 class HeatmapColorTip<T extends Comparable<T>> extends StatelessWidget {
   final double cellSpaceBetween;

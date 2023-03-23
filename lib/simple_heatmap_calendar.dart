@@ -13,6 +13,11 @@ export 'src/heatmap_calendar.dart'
         CalendarColorTipPosition,
         CalendarColorTipAlignBy,
         CalendarAutoChippedBasis;
-export 'src/heatmap_cell.dart' show HeatmapCell;
-export 'src/heatmap_colortip.dart' show HeatmapColorTip;
-export 'src/const.dart';
+
+export 'src/widget/_cell.dart' show HeatmapCell;
+
+export 'src/widget/colortip.dart' show HeatmapColorTip;
+
+export 'src/widget/weeklabel.dart' show WeekLabelItem, WeekLabelColumn;
+
+export 'src/const.dart' hide maxDayOfWeek;

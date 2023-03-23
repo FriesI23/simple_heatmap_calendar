@@ -1,16 +1,41 @@
-import 'dart:math' as math;
 import 'dart:collection';
+import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 
 import 'const.dart';
-import 'heatmap_cell.dart';
-import 'heatmap_colortip.dart';
 import 'utils.dart';
+import 'widget/cellitem.dart';
+import 'widget/colortip.dart';
+import 'widget/monthlabel.dart';
+import 'widget/weeklabel.dart';
 
 typedef ValueBuilder = Widget? Function(BuildContext context, int? dateDay);
+
+typedef WeekLabelValueBuilder = Widget? Function(
+  BuildContext context,
+  DateTime protoDate,
+  String defaultFormat,
+);
+
+typedef MonthLabelValueBuilder = Widget? Function(
+  BuildContext context,
+  DateTime date,
+  String defaultFormat,
+);
+
+typedef CellItemBuilder = Widget? Function(
+  BuildContext context,
+  Widget Function(BuildContext, {ValueBuilder? valueBuilder}) childBuilder,
+  int columnIndex,
+  int rowIndex,
+  DateTime date,
+);
+
+typedef CellPressedCallback<T> = void Function(DateTime date, T? value)?;
 
 class HeatmapCalendarStyle {
   /// change heatmap cell container color
@@ -176,11 +201,11 @@ class HeatmapSwitchParameters {
 class HeatmapCallbackModel<T> {
   /// callback when heatmap cell clicked,
   /// `HeatmapSwitchParameters.tappable` must be `true``
-  final void Function(DateTime date, T? value)? onCellPressed;
+  final CellPressedCallback<T>? onCellPressed;
 
   /// callback when heatmap cell long clicked
   /// `HeatmapSwitchParameters.tappable` must be `true``
-  final void Function(DateTime date, T? value)? onCellLongPressed;
+  final CellPressedCallback<T>? onCellLongPressed;
 
   const HeatmapCallbackModel({
     this.onCellPressed,
@@ -305,13 +330,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///   );
   /// },
   /// ```
-  final Widget Function(
-    BuildContext context,
-    Widget Function(BuildContext, {ValueBuilder? valueBuilder}) childBuilder,
-    int columnIndex,
-    int rowIndex,
-    DateTime date,
-  )? cellBuilder;
+  final CellItemBuilder? cellBuilder;
 
   /// Customn month label builder
   /// e.g.
@@ -320,11 +339,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///   return Text(DateFormat(DateFormat.YEAR_MONTH).format(data));
   /// }
   /// ```
-  final Widget Function(
-    BuildContext context,
-    DateTime date,
-    String defaultFormat,
-  )? monthLabelItemBuilder;
+  final MonthLabelValueBuilder? monthLabelItemBuilder;
 
   /// Custom week label builder
   /// e.g.
@@ -333,11 +348,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///   Text(DateFormat('cccc', myLocale).format(protoDate));
   /// }
   /// ```
-  final Widget Function(
-    BuildContext context,
-    DateTime protoDate,
-    String defaultFormat,
-  )? weekLabelValueBuilder;
+  final WeekLabelValueBuilder? weekLabelValueBuilder;
 
   const HeatmapCalendar({
     super.key,
@@ -381,9 +392,6 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
 
 class _HeatmapCalendar<T extends Comparable<T>>
     extends State<HeatmapCalendar<T>> {
-  static const _maxDayOfWeek = DateTime.sunday;
-  static const _labelTextSizeMultiple = 3;
-
   late SplayTreeMap<T, Color> colorMap;
   late SplayTreeMap<T, Color> valueColorMap;
   late HeatmapCalendarLocationCalclator _model;
@@ -461,7 +469,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
   Size get cellSize => _overlayCellSize ?? widget.cellSize;
 
   double get heatmapHeight =>
-      _maxDayOfWeek * cellSize.height + (_maxDayOfWeek - 1) * cellSpaceBetween;
+      maxDayOfWeek * cellSize.height + (maxDayOfWeek - 1) * cellSpaceBetween;
 
   double get heatmapWidth {
     var columnCount = model.offsetColumnWithEndDate + 1;
@@ -546,19 +554,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
 
   EdgeInsets getCellPadding(int columnIndex, int rowIndex) {
     return EdgeInsets.only(
-      left: columnIndex == 0 ? 0.0 : cellSpaceBetween,
-      top: rowIndex == 0 ? 0.0 : cellSpaceBetween,
-    );
-  }
-
-  EdgeInsets getWeekLabelPadding(int rowIndex) {
-    return EdgeInsets.only(
-      left: weekLabelLocation == CalendarWeekLabelPosition.left
-          ? 0.0
-          : weekLabelSpaceBetweenHeatmap,
-      right: weekLabelLocation == CalendarWeekLabelPosition.right
-          ? 0.0
-          : weekLabelSpaceBetweenHeatmap,
+      // left: columnIndex == 0 ? 0.0 : cellSpaceBetween,
       top: rowIndex == 0 ? 0.0 : cellSpaceBetween,
     );
   }
@@ -632,6 +628,13 @@ class _HeatmapCalendar<T extends Comparable<T>>
     }
   }
 
+  void syncScrollPostionListener() {
+    if (calendarLabelLocation != null &&
+        controller.position.pixels != _labelController.position.pixels) {
+      _labelController.jumpTo(controller.position.pixels);
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -650,13 +653,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
     );
     controller = widget._controller ?? ScrollController();
     _labelController = ScrollController();
-    if (calendarLabelLocation != null) {
-      controller.addListener(() {
-        if (controller.position.pixels != _labelController.position.pixels) {
-          _labelController.jumpTo(controller.position.pixels);
-        }
-      });
-    }
+    controller.addListener(syncScrollPostionListener);
     // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
     //   switch (defaultLocation) {
     //     case CalendarScrollPosition.start:
@@ -676,348 +673,36 @@ class _HeatmapCalendar<T extends Comparable<T>>
     super.dispose();
   }
 
-  Widget _cellBuilder(
-    BuildContext context, {
-    required int columnIndex,
-    required int rowIndex,
-    required DateTime date,
-    required HeatmapCalendarStyle defaultStyle,
-    ValueBuilder? valueBuilder,
-  }) {
-    Color cellColor, valueColor;
-    int? dateDay;
-    EdgeInsets padding;
-    bool isValidCell = true;
-    if (date.isBefore(model.startDate) || date.isAfter(model.endedDate)) {
-      cellColor = Colors.transparent;
-      isValidCell = false;
-    } else {
-      var selectedColor = getSelectedDateColor(date);
-      cellColor = selectedColor ??
-          userStyle?.cellBackgroundColor ??
-          defaultStyle.cellBackgroundColor!;
-      dateDay = showCellText ? date.day : null;
-    }
-    valueColor = getSelectedDateValueColor(date) ??
-        userStyle?.cellValueColor ??
-        defaultStyle.cellValueColor!;
-
-    padding = getCellPadding(columnIndex, rowIndex);
-
-    Widget cell = HeatmapCell<int>(
-      key: ValueKey(cellColor),
-      size: cellSize,
-      color: cellColor,
-      padding: userStyle?.cellValuePadding ?? defaultStyle.cellValuePadding,
-      radius: userStyle?.cellRadius ?? defaultStyle.cellRadius,
-      value: dateDay,
-      valueColor: valueColor,
-      valueBuilder: autoScaled
-          ? (context, value) => FittedBox(
-                child: value != null
-                    ? (valueBuilder != null
-                        ? valueBuilder(context, value)
-                        : Text(value.toString()))
-                    : (valueBuilder != null
-                        ? valueBuilder(context, value)
-                        : null),
-              )
-          : valueBuilder,
-      valueSize: userStyle?.cellValueFontSize ?? defaultStyle.cellValueFontSize,
-    );
-
-    cell = widget.cellChangeAnimateDuration != Duration.zero
-        ? AnimatedSwitcher(
-            duration: widget.cellChangeAnimateDuration,
-            switchInCurve: Curves.easeInQuint,
-            switchOutCurve: Curves.easeOutQuint,
-            transitionBuilder: widget.cellChangeAnimateTransitionBuilder ??
-                AnimatedSwitcher.defaultTransitionBuilder,
-            child: cell,
-          )
-        : cell;
-
-    if (tappable && isValidCell) {
-      cell = InkWell(
-        borderRadius: userStyle?.cellRadius ?? defaultStyle.cellRadius,
-        onTap: callbacks?.onCellPressed != null
-            ? () => callbacks!.onCellPressed!(date, selectedMap?[date])
-            : null,
-        onLongPress: callbacks?.onCellLongPressed != null
-            ? () => callbacks!.onCellLongPressed!(date, selectedMap?[date])
-            : null,
-        child: cell,
-      );
-    }
-
-    return Padding(
-      padding: padding,
-      child: cell,
-    );
-  }
-
-  Widget _getWeekLabelItem(
-      BuildContext context, int rowIndex, HeatmapCalendarStyle defaultStyle) {
-    var date = model.getProtoDateByOffsetRow(rowIndex);
-    var formatter = 'ccccc';
-
-    Widget? valueBuilder(BuildContext context, String? value) {
-      if (widget.weekLabelValueBuilder != null) {
-        return widget.weekLabelValueBuilder!(context, date, formatter);
-      }
-      if (value == null) return null;
-      if (autoScaled) return FittedBox(child: Text(value));
-      return Text(value);
-    }
-
-    return Padding(
-      padding: getWeekLabelPadding(rowIndex),
-      child: HeatmapCell<String>(
-        size: weekLabelCellSize,
-        color: Colors.transparent,
-        value: DateFormat(formatter, localeName).format(date),
-        valueColor: userStyle?.weekLabelColor ?? defaultStyle.weekLabelColor,
-        valueAlignment: userStyle?.weekLabelValueAlignment ??
-            defaultStyle.weekLabelValueAlignment,
-        valueBuilder: widget.weekLabelValueBuilder == null && !autoScaled
-            ? null
-            : valueBuilder,
-        valueSize: userStyle?.weekLabelValueFontSize ??
-            defaultStyle.weekLabelValueFontSize,
-      ),
-    );
-  }
-
-  Widget _getMonthLabelItem(
-      BuildContext context, DateTime date, HeatmapCalendarStyle style) {
-    var formatter = date.month == 1 &&
-            (userStyle?.showYearOnMonthLabel ?? style.showYearOnMonthLabel)
-        ? "yMMM"
-        : "MMM";
-    return DefaultTextStyle(
-      style: TextStyle(
-        color: userStyle?.monthLabelColor ?? style.monthLabelColor,
-        fontSize: userStyle?.monthLabelFontSize ?? style.monthLabelFontSize,
-      ),
-      child: widget.monthLabelItemBuilder?.call(context, date, formatter) ??
-          Text(DateFormat(formatter, localeName).format(date)),
-    );
-  }
-
-  Widget _monthLabelBuilder(BuildContext context) {
-    var style = _getDefaultStyle(context);
-    var dateMap = <int, DateTime>{};
-    if (model.startDate.day == 1) {
-      dateMap[model.getOffsetColumn(model.startDate)] = model.startDate;
-    }
-    var tmpDate = model.startDate;
-    while (tmpDate.isBefore(model.endedDate)) {
-      tmpDate = DateTime(tmpDate.year, tmpDate.month + 1, 1);
-      dateMap[model.getOffsetColumn(tmpDate)] = tmpDate;
-    }
-
-    var children = <Widget>[];
-    var columns = model.offsetColumnWithEndDate + 1;
-
-    var columnIndex = 0;
-    var maxColumnIndex = model.offsetColumnWithEndDate;
-    while (columnIndex < maxColumnIndex) {
-      var padding = getCellPadding(columnIndex, 0);
-      if (dateMap.containsKey(columnIndex) &&
-          (columns - columnIndex) >= _labelTextSizeMultiple) {
-        var date = dateMap[columnIndex]!;
-        children.add(
-          Padding(
-            padding: padding,
-            child: SizedBox(
-              width: cellSize.width * _labelTextSizeMultiple +
-                  padding.left * (_labelTextSizeMultiple - 1),
-              child: _getMonthLabelItem(context, date, style),
-            ),
-          ),
-        );
-        columnIndex += _labelTextSizeMultiple;
-      } else {
-        children.add(
-          Padding(
-            padding: padding,
-            child: ConstrainedBox(
-              constraints: BoxConstraints.tightFor(width: cellSize.width),
-            ),
-          ),
-        );
-        columnIndex += 1;
-      }
-    }
-
-    return Row(children: children);
-  }
-
   @override
   Widget build(BuildContext context) {
     var style = _getDefaultStyle(context);
-
-    Widget buildHeatmapCell(
-        BuildContext context, int columnIndex, int rowIndex) {
-      var dateColumnIndex = weekLabelLocation == CalendarWeekLabelPosition.left
-          ? columnIndex - 1
-          : columnIndex;
-      var date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
-
-      Widget childBuilder(BuildContext context, {ValueBuilder? valueBuilder}) =>
-          _cellBuilder(
-            context,
-            date: date,
-            columnIndex: columnIndex,
-            rowIndex: rowIndex,
-            defaultStyle: style,
-            valueBuilder: valueBuilder,
-          );
-
-      if (widget.cellBuilder != null) {
-        return widget.cellBuilder!(
-          context,
-          childBuilder,
-          columnIndex,
-          rowIndex,
-          date,
-        );
-      } else {
-        return childBuilder(context);
-      }
-    }
-
-    Widget buildHeatmapWeekLabels(BuildContext context) {
-      return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: List<Widget>.generate(
-          _maxDayOfWeek,
-          (rowIndex) => _getWeekLabelItem(context, rowIndex, style),
-        ),
-      );
-    }
-
-    Widget buildHeatmap(BuildContext context) {
-      var needBuildFromEnd = defaultLocation == CalendarScrollPosition.ended;
-      var itemMaxIndex = model.offsetColumnWithEndDate;
-      if (weekLabelLocation != null) itemMaxIndex += 1;
-
-      return ListView.builder(
-        itemBuilder: (context, columnIndex) {
-          if (needBuildFromEnd) columnIndex = itemMaxIndex - columnIndex;
-
-          if ((columnIndex == 0 &&
-                  weekLabelLocation == CalendarWeekLabelPosition.left) ||
-              (columnIndex == itemMaxIndex &&
-                  weekLabelLocation == CalendarWeekLabelPosition.right)) {
-            return buildHeatmapWeekLabels(context);
-          }
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: List<Widget>.generate(
-              _maxDayOfWeek,
-              (rowIndex) => buildHeatmapCell(context, columnIndex, rowIndex),
-            ),
-          );
-        },
-        reverse: needBuildFromEnd,
-        itemCount: itemMaxIndex + 1,
-        scrollDirection: Axis.horizontal,
-        physics: canScroll ? null : const NeverScrollableScrollPhysics(),
-        controller: controller,
-      );
-    }
-
-    Widget buildCalendarLabel(BuildContext context) {
-      return SingleChildScrollView(
-        controller: _labelController,
-        scrollDirection: Axis.horizontal,
-        reverse: defaultLocation == CalendarScrollPosition.ended,
-        physics: const NeverScrollableScrollPhysics(),
-        child: SizedBox(
-          width: widgetWidth,
-          child: _monthLabelBuilder(context),
-        ),
-      );
-    }
-
-    Widget buildColorTip(BuildContext context) {
-      var offset = userStyle?.colorTipPosOffset ?? style.colorTipPosOffset;
-
-      var colorTipAlignBy = userStyle?.colorTipAlignBy ?? style.colorTipAlignBy;
-      MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center;
-      if (colorTipAlignBy == null) {
-        switch (defaultLocation) {
-          case CalendarScrollPosition.start:
-            colorTipAlignBy = CalendarColorTipAlignBy.left;
-            mainAxisAlignment = MainAxisAlignment.start;
-            break;
-          case CalendarScrollPosition.ended:
-            colorTipAlignBy = CalendarColorTipAlignBy.right;
-            mainAxisAlignment = MainAxisAlignment.end;
-            break;
-        }
-      }
-
-      double topPadding = cellSpaceBetween, bottomPadding = cellSpaceBetween;
-      switch (colorTipLocation) {
-        case CalendarColorTipPosition.top:
-          bottomPadding = colorTipSpaceBetweenHeatmap;
-          break;
-        case CalendarColorTipPosition.bottom:
-          topPadding = colorTipSpaceBetweenHeatmap;
-          break;
-        default:
-          break;
-      }
-
-      return Container(
-        padding: EdgeInsets.only(
-          top: topPadding,
-          bottom: bottomPadding,
-        ),
-        width: widgetWidth,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: mainAxisAlignment,
-          children: [
-            if (colorTipAlignBy == CalendarColorTipAlignBy.left)
-              SizedBox(width: offset.toDouble()),
-            Flexible(
-              flex: 1,
-              child: HeatmapColorTip<T>(
-                cellSize: colorTipCellSize,
-                cellSpaceBetween: colorTipCellBetweem,
-                cellRadius:
-                    userStyle?.colorTipCellRadius ?? style.colorTipCellRadius,
-                leftTip: _getColorTipLeftHelper(context),
-                rigthtTip: _getColorTipRightHelper(context),
-                colors: getSampleColorsFromColorMap().toList(),
-              ),
-            ),
-            if (colorTipAlignBy == CalendarColorTipAlignBy.right)
-              SizedBox(width: offset.toDouble()),
-          ],
-        ),
-      );
-    }
 
     Widget buildFrame(BuildContext context) {
       var children = <Widget>[
         SizedBox(
           height: heatmapHeight,
           width: widgetWidth,
-          child: buildHeatmap(context),
+          child: Builder(builder: (context) => _buildHeatmap(context, style)),
         )
       ];
 
       switch (calendarLabelLocation) {
         case CalendarMonthLabelPosition.top:
-          children.insert(0, buildCalendarLabel(context));
+          children.insert(
+            0,
+            Builder(
+              key: ValueKey(calendarLabelLocation),
+              builder: (context) => _buildCalendarLabel(context, style),
+            ),
+          );
           break;
         case CalendarMonthLabelPosition.bottom:
-          children.add(buildCalendarLabel(context));
+          children.add(
+            Builder(
+              key: ValueKey(calendarLabelLocation),
+              builder: (context) => _buildCalendarLabel(context, style),
+            ),
+          );
           break;
         default:
           break;
@@ -1025,10 +710,21 @@ class _HeatmapCalendar<T extends Comparable<T>>
 
       switch (colorTipLocation) {
         case CalendarColorTipPosition.top:
-          children.insert(0, buildColorTip(context));
+          children.insert(
+            0,
+            Builder(
+              key: ValueKey(colorTipLocation),
+              builder: (context) => _buildColorTip(context, style),
+            ),
+          );
           break;
         case CalendarColorTipPosition.bottom:
-          children.add(buildColorTip(context));
+          children.add(
+            Builder(
+              key: ValueKey(colorTipLocation),
+              builder: (context) => _buildColorTip(context, style),
+            ),
+          );
           break;
         default:
           break;
@@ -1045,7 +741,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
           var size =
               (constraints.maxWidth - (columnCount - 1) * cellSpaceBetween) /
                   columnCount;
-          debugPrint(size.toString());
           _overlayCellSize = Size.square(math.max(0.1, size));
           return buildFrame(context);
         },
@@ -1062,9 +757,9 @@ class _HeatmapCalendar<T extends Comparable<T>>
           switch (autoClippedBasis) {
             case CalendarAutoChippedBasis.left:
               var newEndedDate = _model.startDate.add(Duration(
-                  days: (_maxDayOfWeek - 1) -
+                  days: (maxDayOfWeek - 1) -
                       _model.offsetRowWithStartDate +
-                      (clippedHeatmapColumn - 1) * _maxDayOfWeek));
+                      (clippedHeatmapColumn - 1) * maxDayOfWeek));
               if (newEndedDate.isBefore(_model.endedDate)) {
                 _clippedModel = _model.copyWith(endedDate: newEndedDate);
               } else {
@@ -1074,7 +769,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
             case CalendarAutoChippedBasis.right:
               var newStartDate = _model.endedDate.subtract(Duration(
                   days: _model.offsetRowWithEndDate +
-                      (clippedHeatmapColumn - 1) * _maxDayOfWeek));
+                      (clippedHeatmapColumn - 1) * maxDayOfWeek));
               if (newStartDate.isAfter(_model.startDate)) {
                 _clippedModel = _model.copyWith(startDate: newStartDate);
               } else {
@@ -1090,5 +785,175 @@ class _HeatmapCalendar<T extends Comparable<T>>
     } else {
       return buildFrame(context);
     }
+  }
+
+  Widget _buildHeatmap(BuildContext context, HeatmapCalendarStyle style) {
+    var needBuildFromEnd = defaultLocation == CalendarScrollPosition.ended;
+    var itemMaxIndex = model.offsetColumnWithEndDate;
+    if (weekLabelLocation != null) itemMaxIndex += 1;
+
+    return ListView.separated(
+      itemBuilder: (context, columnIndex) {
+        if (needBuildFromEnd) columnIndex = itemMaxIndex - columnIndex;
+
+        if ((columnIndex == 0 &&
+                weekLabelLocation == CalendarWeekLabelPosition.left) ||
+            (columnIndex == itemMaxIndex &&
+                weekLabelLocation == CalendarWeekLabelPosition.right)) {
+          return WeekLabelColumn(
+            model: model,
+            format: DateFormat(defaultWeekLabelDateFormatter, localeName),
+            valueColor: userStyle?.weekLabelColor ?? style.weekLabelColor,
+            valueAlignment: userStyle?.weekLabelValueAlignment ??
+                style.weekLabelValueAlignment,
+            valueSize: userStyle?.weekLabelValueFontSize ??
+                style.weekLabelValueFontSize,
+            cellSize: weekLabelCellSize,
+            cellSpaceBetween: cellSpaceBetween,
+            autoScaled: autoScaled,
+            weekLabelLocation: weekLabelLocation,
+            weekLabelSpaceBetweenHeatmap: weekLabelSpaceBetweenHeatmap,
+            weekLabelValueBuilder: widget.weekLabelValueBuilder,
+          );
+        }
+
+        return HeatmapCellItemColumn<T>(
+          model: model,
+          columnIndex: columnIndex,
+          weekLabelLocation: weekLabelLocation,
+          cellSize: cellSize,
+          cellRadius: userStyle?.cellRadius ?? style.cellRadius,
+          cellValueSize:
+              userStyle?.cellValueFontSize ?? style.cellValueFontSize,
+          cellValuePadding:
+              userStyle?.cellValuePadding ?? style.cellValuePadding,
+          showCellText: showCellText,
+          autoScaled: autoScaled,
+          tappable: tappable,
+          cellChangeAnimateDuration: widget.cellChangeAnimateDuration,
+          cellChangeAnimateTransitionBuilder:
+              widget.cellChangeAnimateTransitionBuilder,
+          getSelectedDateColor: (date) =>
+              getSelectedDateColor(date) ??
+              userStyle?.cellBackgroundColor ??
+              style.cellBackgroundColor!,
+          getSelectedDateValueColor: (date) =>
+              getSelectedDateValueColor(date) ??
+              userStyle?.cellValueColor ??
+              style.cellValueColor!,
+          onCellPressed: callbacks?.onCellPressed,
+          onCellLongPressed: callbacks?.onCellLongPressed,
+          getValue: (date) => selectedMap?[date],
+          getCellPadding: (columnIndex, rowIndex) =>
+              getCellPadding(columnIndex, rowIndex),
+          cellItemBuilder: widget.cellBuilder,
+        );
+      },
+      separatorBuilder: (context, index) {
+        if (index == 0 || index >= itemMaxIndex) {
+          return const SizedBox();
+        }
+
+        return SizedBox(width: cellSpaceBetween);
+      },
+      reverse: needBuildFromEnd,
+      itemCount: itemMaxIndex + 1,
+      scrollDirection: Axis.horizontal,
+      physics: canScroll ? null : const NeverScrollableScrollPhysics(),
+      controller: controller,
+    );
+  }
+
+  Widget _buildCalendarLabel(BuildContext context, HeatmapCalendarStyle style) {
+    return SingleChildScrollView(
+      controller: _labelController,
+      scrollDirection: Axis.horizontal,
+      reverse: defaultLocation == CalendarScrollPosition.ended,
+      physics: const NeverScrollableScrollPhysics(),
+      child: SizedBox(
+        width: widgetWidth,
+        child: MonthLabelRow(
+          model: model,
+          offset: weekLabelWidth,
+          weekLabelLocation: weekLabelLocation,
+          cellSize: cellSize,
+          cellSpaceBetween: cellSpaceBetween,
+          monthLabelColor: userStyle?.monthLabelColor ?? style.monthLabelColor,
+          monthLabelFontSize:
+              userStyle?.monthLabelFontSize ?? style.monthLabelFontSize,
+          getFormat: (date) {
+            var formatter = date.month == 1 &&
+                    (userStyle?.showYearOnMonthLabel ??
+                        style.showYearOnMonthLabel)
+                ? "yMMM"
+                : "MMM";
+            return DateFormat(formatter, localeName);
+          },
+          getCellPadding: (columnIndex) => getCellPadding(columnIndex, 0),
+          monthLabelItemBuilder: widget.monthLabelItemBuilder,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorTip(BuildContext context, HeatmapCalendarStyle style) {
+    var offset = userStyle?.colorTipPosOffset ?? style.colorTipPosOffset;
+
+    var colorTipAlignBy = userStyle?.colorTipAlignBy ?? style.colorTipAlignBy;
+    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.center;
+    if (colorTipAlignBy == null) {
+      switch (defaultLocation) {
+        case CalendarScrollPosition.start:
+          colorTipAlignBy = CalendarColorTipAlignBy.left;
+          mainAxisAlignment = MainAxisAlignment.start;
+          break;
+        case CalendarScrollPosition.ended:
+          colorTipAlignBy = CalendarColorTipAlignBy.right;
+          mainAxisAlignment = MainAxisAlignment.end;
+          break;
+      }
+    }
+
+    double topPadding = cellSpaceBetween, bottomPadding = cellSpaceBetween;
+    switch (colorTipLocation) {
+      case CalendarColorTipPosition.top:
+        bottomPadding = colorTipSpaceBetweenHeatmap;
+        break;
+      case CalendarColorTipPosition.bottom:
+        topPadding = colorTipSpaceBetweenHeatmap;
+        break;
+      default:
+        break;
+    }
+
+    return Container(
+      padding: EdgeInsets.only(
+        top: topPadding,
+        bottom: bottomPadding,
+      ),
+      width: widgetWidth,
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: mainAxisAlignment,
+        children: [
+          if (colorTipAlignBy == CalendarColorTipAlignBy.left)
+            SizedBox(width: offset.toDouble()),
+          Flexible(
+            flex: 1,
+            child: HeatmapColorTip<T>(
+              cellSize: colorTipCellSize,
+              cellSpaceBetween: colorTipCellBetweem,
+              cellRadius:
+                  userStyle?.colorTipCellRadius ?? style.colorTipCellRadius,
+              leftTip: _getColorTipLeftHelper(context),
+              rigthtTip: _getColorTipRightHelper(context),
+              colors: getSampleColorsFromColorMap().toList(),
+            ),
+          ),
+          if (colorTipAlignBy == CalendarColorTipAlignBy.right)
+            SizedBox(width: offset.toDouble()),
+        ],
+      ),
+    );
   }
 }
