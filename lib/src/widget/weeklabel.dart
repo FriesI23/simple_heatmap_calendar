@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+
 import 'package:intl/intl.dart';
 
-import 'const.dart';
-import 'heatmap_calendar.dart';
-import 'heatmap_cell.dart';
-import 'utils.dart';
+import '../const.dart';
+import '../heatmap_calendar.dart';
+import '../utils.dart';
+
+import '_cell.dart';
 
 class WeekLabelItem extends StatelessWidget {
   final DateTime date;
