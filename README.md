@@ -6,7 +6,11 @@ Powerful and easy-to-use heatmap flutter chart package.
 
 ## Features
 
-Check example by run code `example/main.dart`
+- support intl.
+- various configuration choices.
+- has better performance when dealing with a large time span on the calendar.
+
+More details check example by run code `example/main.dart`
 
 <img src="https://user-images.githubusercontent.com/20661034/224278286-08dde6be-2e6d-4f9e-a732-07add1842c6c.gif" alt= “” width="200" height="466">
 <img src="https://user-images.githubusercontent.com/20661034/224278425-5ea1b21f-290c-44d1-8e92-e919ef1fc82e.gif" alt= “” width="200" height="466">

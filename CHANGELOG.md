@@ -1,3 +1,7 @@
+## 0.1.2
+
+- expose labelTextSizeMultiple in MonthLabelRow
+
 ## 0.1.1
 
 - dart dependency changed: 2.17.0~3.0.0

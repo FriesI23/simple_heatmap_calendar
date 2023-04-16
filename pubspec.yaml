@@ -1,6 +1,6 @@
 name: simple_heatmap_calendar
 description: A powerful and easy-to-use flutter heatmap calendar package
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/FriesI23/simple_heatmap_calendar
 
 environment:
