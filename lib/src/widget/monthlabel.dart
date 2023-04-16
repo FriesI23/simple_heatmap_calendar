@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 
 import '../heatmap_calendar.dart';
@@ -72,7 +71,7 @@ class MonthLabelRow extends StatelessWidget {
     this.getFormat,
     this.getCellPadding,
     this.monthLabelItemBuilder,
-  });
+  }) : assert(labelTextSizeMultiple > 0);
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
@@ -22,6 +24,7 @@ class _CustomProvider {
   bool expandWeekLabel = true;
   bool expandMonthLabel = false;
   double monthLabelFontSize = 0.0;
+  int monthLabelTextSizeMultiple = 3;
   CalendarAutoChippedBasis? autoClip;
   CalendarWeekLabelPosition? weekLabelPosition =
       CalendarWeekLabelPosition.right;
@@ -111,6 +114,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
         cellRadius: BorderRadius.all(Radius.circular(data.cellRadius)),
         monthLabelFontSize:
             data.monthLabelFontSize > 0 ? data.monthLabelFontSize : null,
+        monthLabelTextSizeMultiple: data.monthLabelTextSizeMultiple,
       ),
       switchParameters: HeatmapSwitchParameters.defaults(
         showCellText: data.cellSize > 24 ? data.showText : false,
@@ -504,6 +508,21 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           onChanged: (bool value) => setState(() {
             data.expandMonthLabel = value;
           }),
+        ),
+        // monthLabelTextSizeMultiple
+        ListTile(
+          title: const Text("monthLabelTextSizeMultiple"),
+          subtitle: Slider(
+            value: data.monthLabelTextSizeMultiple.toDouble(),
+            min: 1.0,
+            max: 10.0,
+            divisions: 9,
+            label: data.monthLabelTextSizeMultiple.toString(),
+            onChanged: (value) => setState(() {
+              data.monthLabelTextSizeMultiple = min(10, max(1, value.toInt()));
+            }),
+          ),
+          leading: const Icon(Icons.aspect_ratio),
         ),
       ],
     );

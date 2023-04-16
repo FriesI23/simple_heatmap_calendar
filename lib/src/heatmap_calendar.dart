@@ -3,7 +3,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
 
 import 'const.dart';
@@ -79,6 +78,9 @@ class HeatmapCalendarStyle {
   /// change month label font size
   final double? monthLabelFontSize;
 
+  // Set the width of several cells, default: 3
+  final int? monthLabelTextSizeMultiple;
+
   /// if set false, The month of the New Year will only be displayed as the month
   /// (rather than year and month).
   /// e.g true "Dec ... 2022 Jan ... Feb", false "Dec ... Jan ... Feb"
@@ -111,6 +113,7 @@ class HeatmapCalendarStyle {
     this.weekLabelValueFontSize,
     this.monthLabelColor,
     this.monthLabelFontSize,
+    this.monthLabelTextSizeMultiple,
     required this.showYearOnMonthLabel,
     this.colorTipCellRadius,
     required this.colorTipPosOffset,
@@ -128,6 +131,7 @@ class HeatmapCalendarStyle {
     this.weekLabelValueFontSize,
     this.monthLabelColor,
     this.monthLabelFontSize,
+    this.monthLabelTextSizeMultiple = 3,
     this.showYearOnMonthLabel = true,
     this.colorTipCellRadius,
     this.colorTipPosOffset = 60,
@@ -881,6 +885,8 @@ class _HeatmapCalendar<T extends Comparable<T>>
           monthLabelColor: userStyle?.monthLabelColor ?? style.monthLabelColor,
           monthLabelFontSize:
               userStyle?.monthLabelFontSize ?? style.monthLabelFontSize,
+          labelTextSizeMultiple: userStyle?.monthLabelTextSizeMultiple ??
+              style.monthLabelTextSizeMultiple!,
           getFormat: (date) {
             var formatter = date.month == 1 &&
                     (userStyle?.showYearOnMonthLabel ??
