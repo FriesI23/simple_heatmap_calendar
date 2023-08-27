@@ -1,5 +1,10 @@
 # Simple Heatmap Calendar
 
+![Package][pubdev-package]
+![Likes][pubdev-likes]
+![Popularity][pubdev-popularity]
+![Points][pubdev-points]
+
 ![banner][banner]
 
 Powerful and easy-to-use heatmap flutter chart package.
@@ -139,6 +144,10 @@ SOFTWARE.
 
 ```
 
+[pubdev-package]: https://img.shields.io/pub/v/simple_heatmap_calendar.svg
+[pubdev-likes]: https://img.shields.io/pub/likes/simple_heatmap_calendar?logo=dart
+[pubdev-popularity]: https://img.shields.io/pub/popularity/simple_heatmap_calendar?logo=dart
+[pubdev-points]: https://img.shields.io/pub/points/simple_heatmap_calendar?logo=dart
 [banner]: https://user-images.githubusercontent.com/20661034/224279041-833335b9-70c5-41b9-826b-0214ac525b6b.png
 [sc01]: https://user-images.githubusercontent.com/20661034/224278286-08dde6be-2e6d-4f9e-a732-07add1842c6c.gif
 [sc02]: https://user-images.githubusercontent.com/20661034/224278425-5ea1b21f-290c-44d1-8e92-e919ef1fc82e.gif
