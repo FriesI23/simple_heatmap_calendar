@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 
 class HeatmapCalendarLocationCalclator {
-  static final protoSunday = DateTime(2023, 3, 5);
+  static final _protoSunday = DateTime(2023, 3, 5);
+  static final _protoSundayUTC = DateTime.utc(2023, 3, 5);
 
   final DateTime startDate;
   final DateTime endedDate;
   final int firstDay;
+  final bool withUTC;
   final Map<DateTime, int> _columnCache = {};
   final Map<DateTime, int> _rowCache = {};
 
@@ -13,7 +15,10 @@ class HeatmapCalendarLocationCalclator {
     required this.startDate,
     required this.endedDate,
     required this.firstDay,
-  }) : assert(firstDay > 0 && firstDay <= 7);
+    required this.withUTC,
+  })  : assert(firstDay > 0 && firstDay <= 7),
+        assert(startDate.isUtc == endedDate.isUtc),
+        assert(startDate.isUtc == withUTC);
 
   int get offsetRowWithStartDate => getOffsetRow(startDate);
 
@@ -55,18 +60,21 @@ class HeatmapCalendarLocationCalclator {
 
   DateTime getProtoDateByOffsetRow(int offsetRow) {
     var weekday = getDateWeekdyByOffsetRow(offsetRow);
-    return protoSunday.add(Duration(days: weekday));
+    return (withUTC ? _protoSundayUTC : _protoSunday)
+        .add(Duration(days: weekday));
   }
 
   HeatmapCalendarLocationCalclator copyWith({
     DateTime? startDate,
     DateTime? endedDate,
     int? firstDay,
+    bool? withUTC,
   }) {
     return HeatmapCalendarLocationCalclator(
       startDate: startDate ?? this.startDate,
       endedDate: endedDate ?? this.endedDate,
       firstDay: firstDay ?? this.firstDay,
+      withUTC: withUTC ?? this.withUTC,
     );
   }
 }

@@ -81,7 +81,11 @@ class MonthLabelRow extends StatelessWidget {
     }
     var tmpDate = model.startDate;
     while (tmpDate.isBefore(model.endedDate)) {
-      tmpDate = DateTime(tmpDate.year, tmpDate.month + 1, 1);
+      if (model.withUTC) {
+        tmpDate = DateTime.utc(tmpDate.year, tmpDate.month + 1, 1);
+      } else {
+        tmpDate = DateTime(tmpDate.year, tmpDate.month + 1, 1);
+      }
       dateMap[model.getOffsetColumn(tmpDate)] = tmpDate;
     }
 

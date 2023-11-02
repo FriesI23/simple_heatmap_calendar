@@ -1,3 +1,10 @@
+# Change log
+
+## 0.2.0-dev
+
+- add utc datetime support
+- fix intl deps
+
 ## 0.1.2
 
 - expose labelTextSizeMultiple in MonthLabelRow
