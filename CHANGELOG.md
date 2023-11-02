@@ -1,6 +1,6 @@
 # Change log
 
-## 0.2.0-dev
+## 0.2.0
 
 - add utc datetime support
 - fix intl deps
@@ -25,7 +25,7 @@
 
 ## 0.0.2
 
-- Add `colorTipSpaceBetweenHeatmap` param in `CalendarHeatmap `
+- Add `colorTipSpaceBetweenHeatmap` param in `CalendarHeatmap`
 
 ## 0.0.1
 

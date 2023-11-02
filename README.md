@@ -117,6 +117,15 @@ class _HomePage extends State<HomePage> {
 
 ```
 
+## Donate
+
+[!["Buy Me A Coffee"][buymeacoffee-badge]](https://www.buymeacoffee.com/d49cb87qgww)
+[![Alipay][alipay-badge]][alipay-addr]
+[![WechatPay][wechat-badge]][wechat-addr]
+
+[![ETH][eth-badge]][eth-addr]
+[![BTC][btc-badge]][btc-addr]
+
 ## License
 
 ```text
@@ -155,3 +164,12 @@ SOFTWARE.
 [sc04]: https://user-images.githubusercontent.com/20661034/224278619-21b04340-2d74-48cc-a0c5-06c67f35cf47.gif
 [sc05]: https://user-images.githubusercontent.com/20661034/224278631-2855d819-f51e-451a-aaf1-b0e2d18507db.gif
 [sc06]: https://user-images.githubusercontent.com/20661034/224278416-37524f10-08b9-4c51-aa19-5e52f0d69e38.gif
+[buymeacoffee-badge]: https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black
+[alipay-badge]: https://img.shields.io/badge/alipay-00A1E9?style=for-the-badge&logo=alipay&logoColor=white
+[alipay-addr]: https://raw.githubusercontent.com/FriesI23/mhabit/main/docs/README/images/donate-alipay.jpg
+[wechat-badge]: https://img.shields.io/badge/WeChat-07C160?style=for-the-badge&logo=wechat&logoColor=white
+[wechat-addr]: https://raw.githubusercontent.com/FriesI23/mhabit/main/docs/README/images/donate-wechatpay.png
+[eth-badge]: https://img.shields.io/badge/Ethereum-3C3C3D?style=for-the-badge&logo=Ethereum&logoColor=white
+[eth-addr]: https://etherscan.io/address/0x35FC877Ef0234FbeABc51ad7fC64D9c1bE161f8F
+[btc-badge]: https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white
+[btc-addr]: https://blockchair.com/bitcoin/address/bc1qz2vjews2fcscmvmcm5ctv47mj6236x9p26zk49
