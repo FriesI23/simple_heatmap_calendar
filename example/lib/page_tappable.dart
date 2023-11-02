@@ -203,8 +203,8 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
             Card(
               child: Container(
                 padding: const EdgeInsets.all(20.0),
-                child: Column(
-                  children: const [
+                child: const Column(
+                  children: [
                     Text("short press: +5"),
                     Text("long press: show dialog"),
                   ],

@@ -242,6 +242,9 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///   static const int sunday = 7;
   final int firstDay;
 
+  /// Handling time using UTC
+  final bool withUTC;
+
   // Provide a map that needs emphasis or color change in a heatmap
   final Map<DateTime, T>? selectedMap;
 
@@ -359,6 +362,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
     required this.startDate,
     required this.endedDate,
     this.firstDay = DateTime.sunday,
+    this.withUTC = false,
     this.selectedMap,
     this.colorMap,
     this.valueColorMap,
@@ -616,6 +620,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
         startDate: widget.startDate,
         endedDate: widget.endedDate,
         firstDay: widget.firstDay,
+        withUTC: widget.withUTC,
       );
     }
     if (!mapEquals(widget.colorMap, oldWidget.colorMap)) {
@@ -646,6 +651,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
       startDate: widget.startDate,
       endedDate: widget.endedDate,
       firstDay: widget.firstDay,
+      withUTC: widget.withUTC,
     );
     colorMap = SplayTreeMap.of(
       widget.colorMap ?? {},

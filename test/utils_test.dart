@@ -21,7 +21,8 @@ void main() {
       var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1),
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.sunday);
+          firstDay: DateTime.sunday,
+          withUTC: false);
       expect(obj.startDate, DateTime(2022, 1, 1));
       expect(obj.endedDate, DateTime(2023, 1, 1));
       expect(obj.firstDay, DateTime.sunday);
@@ -31,17 +32,41 @@ void main() {
         startDate: DateTime(2022, 1, 1),
         endedDate: DateTime(2023, 1, 1),
         firstDay: DateTime.saturday,
+        withUTC: false,
       );
       expect(obj.startDate, DateTime(2022, 1, 1));
       expect(obj.endedDate, DateTime(2023, 1, 1));
       expect(obj.firstDay, DateTime.saturday);
+    });
+    test('withUTC true should use UTC time', () {
+      final utcStartDate = DateTime(2023, 3, 5, 12, 0, 0);
+      expect(
+          () => HeatmapCalendarLocationCalclator(
+                startDate: utcStartDate,
+                endedDate: utcStartDate.add(const Duration(days: 1)),
+                firstDay: 1,
+                withUTC: true,
+              ),
+          throwsA(const TypeMatcher<AssertionError>()));
+    });
+
+    test('withUTC false should use local time', () {
+      final localStartDate = DateTime.utc(2023, 3, 5, 12, 0, 0);
+      expect(
+          () => HeatmapCalendarLocationCalclator(
+                startDate: localStartDate,
+                endedDate: localStartDate.add(const Duration(days: 1)),
+                firstDay: 1,
+                withUTC: false,
+              ),
+          throwsA(const TypeMatcher<AssertionError>()));
     });
     group("api getOffsetRow", () {
       test("firstday is sat", () {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 3);
       });
@@ -49,7 +74,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.sunday,
+          firstDay: DateTime.sunday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 2);
       });
@@ -57,7 +82,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.monday,
+          firstDay: DateTime.monday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 1);
       });
@@ -65,7 +90,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.tuesday,
+          firstDay: DateTime.tuesday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 0);
       });
@@ -73,7 +98,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.wednesday,
+          firstDay: DateTime.wednesday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 6);
       });
@@ -81,7 +106,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.thursday,
+          firstDay: DateTime.thursday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 5);
       });
@@ -89,7 +114,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.friday,
+          firstDay: DateTime.friday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 4);
       });
@@ -97,7 +122,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.friday,
+          firstDay: DateTime.friday, withUTC: false,
         );
         expect(obj.getOffsetRow(DateTime(2022, 1, 20)), 6);
       });
@@ -116,7 +141,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetColumn(DateTime(2022, 1, 2)), 0);
       });
@@ -133,7 +158,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetColumn(DateTime(2022, 1, 7)), 0);
         expect(obj.getOffsetColumn(DateTime(2022, 1, 8)), 1);
@@ -152,7 +177,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetColumn(DateTime(2022, 1, 14)), 1);
         expect(obj.getOffsetColumn(DateTime(2022, 1, 15)), 2);
@@ -179,7 +204,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetColumn(DateTime(2022, 1, 0)), -1);
       });
@@ -196,7 +221,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetColumn(DateTime(2021, 12, 25)), -1);
       });
@@ -213,7 +238,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetColumn(DateTime(2021, 12, 16)), -3);
         expect(obj.getOffsetColumn(DateTime(2021, 12, 17)), -3);
@@ -240,7 +265,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetColumn(DateTime(2022, 1, 1)), 0);
       });
@@ -257,7 +282,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         var date = DateTime(2022, 1, 9);
         var offsetRow = obj.getOffsetRow(date);
@@ -276,7 +301,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         var date = DateTime(2022, 1, 7);
         var offsetRow = obj.getOffsetRow(date);
@@ -286,7 +311,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.sunday,
+          firstDay: DateTime.sunday, withUTC: false,
         );
         var date = DateTime(2022, 1, 4);
         var offsetRow = obj.getOffsetRow(date);
@@ -298,7 +323,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         expect(obj.getOffsetRow(obj.startDate), 3);
         expect(obj.getDateWeekdyByOffsetRow(3), obj.startDate.weekday);
@@ -307,7 +332,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 4), // tuesday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.friday,
+          firstDay: DateTime.friday, withUTC: false,
         );
         expect(obj.getOffsetRow(DateTime(2022, 1, 20)), 6);
         expect(obj.getDateWeekdyByOffsetRow(6), DateTime(2022, 1, 20).weekday);
@@ -327,7 +352,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         var date = DateTime(2022, 1, 2);
         var row = obj.getOffsetRow(date);
@@ -349,7 +374,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
         var date = DateTime(2022, 1, 13);
         var row = obj.getOffsetRow(date);
@@ -371,7 +396,7 @@ void main() {
         var obj = HeatmapCalendarLocationCalclator(
           startDate: DateTime(2022, 1, 1), // saturday
           endedDate: DateTime(2023, 1, 1),
-          firstDay: DateTime.saturday,
+          firstDay: DateTime.saturday, withUTC: false,
         );
 
         var date = DateTime(2022, 1, 0);
@@ -386,7 +411,7 @@ void main() {
           var obj = HeatmapCalendarLocationCalclator(
             startDate: DateTime(2020, 1, 1), // saturday
             endedDate: DateTime(2021, 1, 1),
-            firstDay: i,
+            firstDay: i, withUTC: false,
           );
           for (var j = -10000; j < 10000; j++) {
             var date = obj.startDate.add(Duration(days: j));
@@ -396,6 +421,31 @@ void main() {
             expect(obj.getDateTimeByOffset(row, col), date);
           }
         }
+      });
+    });
+    group('api getProtoDateByOffsetRow', () {
+      test('getProtoDateByOffsetRow (Non-UTC)', () {
+        final calculator = HeatmapCalendarLocationCalclator(
+          startDate: DateTime(2023, 3, 1),
+          endedDate: DateTime(2023, 3, 31),
+          firstDay: 1,
+          withUTC: false,
+        );
+
+        final protoDate = calculator.getProtoDateByOffsetRow(0);
+        expect(protoDate, equals(DateTime(2023, 3, 6)));
+      });
+
+      test('getProtoDateByOffsetRow (UTC)', () {
+        final calculatorWithUTC = HeatmapCalendarLocationCalclator(
+          startDate: DateTime(2023, 3, 1).toUtc(),
+          endedDate: DateTime(2023, 3, 31).toUtc(),
+          firstDay: 1,
+          withUTC: true,
+        );
+
+        final protoDate = calculatorWithUTC.getProtoDateByOffsetRow(0);
+        expect(protoDate, equals(DateTime.utc(2023, 3, 6)));
       });
     });
   });
