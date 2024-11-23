@@ -1,5 +1,37 @@
 import 'dart:math' as math;
 
+extension DateArithmetic on DateTime {
+  /// Subtract the given number of days from this date, maintaining the time.
+  /// This avoids issues with daylight saving time.
+  DateTime subtractDays(int days) {
+    if (isUtc) {
+      return subtract(Duration(days: days));
+    } else {
+      return DateTime(year, month, day - days, hour, minute, second,
+          millisecond, microsecond);
+    }
+  }
+
+  /// Add the given number of days to this date, maintaining the time. This
+  /// avoids issues with daylight saving time.
+  DateTime addDays(int days) {
+    if (isUtc) {
+      return add(Duration(days: days));
+    } else {
+      return DateTime(year, month, day + days, hour, minute, second,
+          millisecond, microsecond);
+    }
+  }
+
+  /// Returns the difference in days between this date and the given date,
+  /// rounding to the nearest day in order to account for DST.
+  int differenceInDays(DateTime other) {
+    // Doing this.difference(other).inDays doesn't work because it only counts
+    // full days, but when DST starts, the day will only be 23 hours long.
+    return (difference(other).inHours / 24).round();
+  }
+}
+
 class HeatmapCalendarLocationCalclator {
   static final _protoSunday = DateTime(2023, 3, 5);
   static final _protoSundayUTC = DateTime.utc(2023, 3, 5);
@@ -35,11 +67,9 @@ class HeatmapCalendarLocationCalclator {
 
   int getOffsetColumn(DateTime date, {int? offsetRow}) {
     if (_columnCache.containsKey(date)) return _columnCache[date]!;
-    final dateF =
-        date.subtract(Duration(days: offsetRow ?? getOffsetRow(date)));
-    final startDateF =
-        startDate.subtract(Duration(days: offsetRowWithStartDate));
-    final offsetWeek = dateF.difference(startDateF).inDays ~/ 7;
+    final dateF = date.subtractDays(offsetRow ?? getOffsetRow(date));
+    final startDateF = startDate.subtractDays(offsetRowWithStartDate);
+    final offsetWeek = dateF.differenceInDays(startDateF) ~/ 7;
     _columnCache[date] = offsetWeek;
     return offsetWeek;
   }
@@ -57,13 +87,12 @@ class HeatmapCalendarLocationCalclator {
       totalDays = -math.max(0, offsetColumn.abs() - 1) * 7;
       totalDays -= (6 - offsetRow + 1) + offsetRowWithStartDate;
     }
-    return startDate.add(Duration(days: totalDays));
+    return startDate.addDays(totalDays);
   }
 
   DateTime getProtoDateByOffsetRow(int offsetRow) {
     final weekday = getDateWeekdyByOffsetRow(offsetRow);
-    return (withUTC ? _protoSundayUTC : _protoSunday)
-        .add(Duration(days: weekday));
+    return (withUTC ? _protoSundayUTC : _protoSunday).addDays(weekday);
   }
 
   HeatmapCalendarLocationCalclator copyWith({
