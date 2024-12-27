@@ -1,3 +1,4 @@
+import 'package:example/l10n/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
@@ -12,16 +13,16 @@ class _FontScalePage extends State<FontScalePage> {
   double _crtfontScale = 1.0;
 
   Widget _buildHeatmapUseMediaQuery(BuildContext context) {
-    final double textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    final textScale = MediaQuery.textScalerOf(context);
+    final calendarSize = textScale
+        .scaleForSize(Size(defaultCellSize.width, defaultCellSize.height));
 
     return HeatmapCalendar<num>(
       startDate: DateTime(2020, 1, 3),
       endedDate: DateTime(2023, 4, 12),
       firstDay: DateTime.monday,
       // change cell size
-      cellSize: Size(defaultCellSize.width * textScaleFactor,
-          defaultCellSize.height * textScaleFactor),
-
+      cellSize: calendarSize,
       colorMap: {
         10: Colors.red.shade100,
         20: Colors.red.shade300,
@@ -82,8 +83,9 @@ class _FontScalePage extends State<FontScalePage> {
                     }),
                   ),
                   MediaQuery(
-                    data: MediaQuery.of(context)
-                        .copyWith(textScaleFactor: _crtfontScale),
+                    data: MediaQuery.of(context).copyWith(
+                        textScaler: MediaQuery.textScalerOf(context)
+                            .clamp(minScaleFactor: _crtfontScale)),
                     child: Builder(
                       builder: (context) => _buildHeatmapUseMediaQuery(context),
                     ),

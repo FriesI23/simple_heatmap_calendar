@@ -75,7 +75,7 @@ class MonthLabelRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var dateMap = <int, DateTime>{};
+    final dateMap = <int, DateTime>{};
     if (model.startDate.day == 1) {
       dateMap[model.getOffsetColumn(model.startDate)] = model.startDate;
     }
@@ -89,8 +89,8 @@ class MonthLabelRow extends StatelessWidget {
       dateMap[model.getOffsetColumn(tmpDate)] = tmpDate;
     }
 
-    var children = <Widget>[];
-    var columns = model.offsetColumnWithEndDate + 1;
+    final children = <Widget>[];
+    final columns = model.offsetColumnWithEndDate + 1;
 
     if (offset != null &&
         offset! > 0 &&
@@ -99,13 +99,13 @@ class MonthLabelRow extends StatelessWidget {
     }
 
     var columnIndex = 0;
-    var maxColumnIndex = model.offsetColumnWithEndDate;
+    final maxColumnIndex = model.offsetColumnWithEndDate;
     while (columnIndex <= maxColumnIndex) {
-      var cellPadding = getCellPadding?.call(columnIndex) ?? EdgeInsets.zero;
+      final cellPadding = getCellPadding?.call(columnIndex) ?? EdgeInsets.zero;
       if (dateMap.containsKey(columnIndex) &&
           (columns - columnIndex) >= labelTextSizeMultiple) {
-        var date = dateMap[columnIndex]!;
-        var format = getFormat?.call(date) ?? DateFormat.yM();
+        final date = dateMap[columnIndex]!;
+        final format = getFormat?.call(date) ?? DateFormat.yM();
         children.add(MonthLabelItem(
           date: date,
           monthLabelColor: monthLabelColor,

@@ -142,7 +142,6 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
       selectedMap: vm.data,
       callbackModel: HeatmapCallbackModel(
         onCellPressed: (date, value) {
-          if (!mounted) return;
           context.read<SelectDateColProvider>().onPressedAddValue(date);
         },
         onCellLongPressed: (date, value) async {
@@ -150,7 +149,7 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
             context: context,
             builder: (context) => _buildChangeValueDialog(context, value),
           );
-          if (!mounted || result == null) return;
+          if (!context.mounted || result == null) return;
           context.read<SelectDateColProvider>().changeValue(date, result);
         },
       ),

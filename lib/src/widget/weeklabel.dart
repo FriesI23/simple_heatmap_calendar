@@ -108,7 +108,7 @@ class WeekLabelColumn extends StatelessWidget {
       children: List<Widget>.generate(
         maxDayOfWeek,
         (rowIndex) {
-          var date = model.getProtoDateByOffsetRow(rowIndex);
+          final date = model.getProtoDateByOffsetRow(rowIndex);
           return WeekLabelItem(
             date: date,
             dateFormatter: format.pattern ?? '',

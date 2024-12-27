@@ -24,7 +24,7 @@ class HeatmapColorTip<T extends Comparable<T>> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var children = <Widget>[];
+    final children = <Widget>[];
     if (leftTip != null) children.add(leftTip!);
     if (colors != null) {
       for (var c in colors!) {
