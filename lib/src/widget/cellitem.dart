@@ -234,11 +234,11 @@ class HeatmapCellItemColumn<T extends Comparable<T>> extends StatelessWidget {
       children: List<Widget>.generate(
         maxDayOfWeek,
         (rowIndex) {
-          var dateColumnIndex =
+          final dateColumnIndex =
               weekLabelLocation == CalendarWeekLabelPosition.left
                   ? columnIndex - 1
                   : columnIndex;
-          var date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
+          final date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
 
           Widget buildItem(BuildContext context, {ValueBuilder? valueBuilder}) {
             return HeatmapCellItem<T>(

@@ -28,16 +28,18 @@ class HeatmapCalendarLocationCalclator {
 
   int getOffsetRow(DateTime date) {
     if (_rowCache.containsKey(date)) return _rowCache[date]!;
-    var offset = (date.weekday + 7 - firstDay) % 7;
+    final offset = (date.weekday + 7 - firstDay) % 7;
     _rowCache[date] = offset;
     return offset;
   }
 
   int getOffsetColumn(DateTime date, {int? offsetRow}) {
     if (_columnCache.containsKey(date)) return _columnCache[date]!;
-    var dateF = date.subtract(Duration(days: offsetRow ?? getOffsetRow(date)));
-    var startDateF = startDate.subtract(Duration(days: offsetRowWithStartDate));
-    var offsetWeek = dateF.difference(startDateF).inDays ~/ 7;
+    final dateF =
+        date.subtract(Duration(days: offsetRow ?? getOffsetRow(date)));
+    final startDateF =
+        startDate.subtract(Duration(days: offsetRowWithStartDate));
+    final offsetWeek = dateF.difference(startDateF).inDays ~/ 7;
     _columnCache[date] = offsetWeek;
     return offsetWeek;
   }
@@ -59,7 +61,7 @@ class HeatmapCalendarLocationCalclator {
   }
 
   DateTime getProtoDateByOffsetRow(int offsetRow) {
-    var weekday = getDateWeekdyByOffsetRow(offsetRow);
+    final weekday = getDateWeekdyByOffsetRow(offsetRow);
     return (withUTC ? _protoSundayUTC : _protoSunday)
         .add(Duration(days: weekday));
   }
