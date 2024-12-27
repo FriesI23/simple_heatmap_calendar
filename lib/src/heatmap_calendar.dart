@@ -502,7 +502,8 @@ class _HeatmapCalendar<T extends Comparable<T>>
     if (theme.useMaterial3) {
       return HeatmapCalendarStyle.defaults(
         cellValueColor: theme.primaryColor,
-        cellBackgroundColor: theme.colorScheme.outlineVariant.withOpacity(0.16),
+        cellBackgroundColor:
+            theme.colorScheme.outlineVariant.withValues(alpha: 0.16),
         cellValuePadding: defaultCellValuePadding,
         cellRadius: defaultCellBorderRadius,
         weekLabelColor: theme.primaryColor,
@@ -512,7 +513,7 @@ class _HeatmapCalendar<T extends Comparable<T>>
     } else {
       return HeatmapCalendarStyle.defaults(
         cellValueColor: theme.primaryColor,
-        cellBackgroundColor: Colors.grey.withOpacity(0.16),
+        cellBackgroundColor: Colors.grey.withValues(alpha: 0.16),
         cellValuePadding: defaultCellValuePadding,
         cellRadius: defaultCellBorderRadius,
         weekLabelColor: theme.primaryColor,
