@@ -317,6 +317,39 @@ void main() {
         final offsetRow = obj.getOffsetRow(date);
         expect(obj.getOffsetColumn(date, offsetRow: offsetRow), 1);
       });
+      test('getOffsetColumn with dst beginning', () {
+        // In the US, 2024 DST starts on 2024-03-10
+        final obj = HeatmapCalendarLocationCalclator(
+          startDate: DateTime(2024, 2, 24), // saturday
+          endedDate: DateTime(2025, 2, 24),
+          firstDay: DateTime.sunday, withUTC: false,
+        );
+        expect(obj.getOffsetColumn(DateTime(2024, 2, 24)), 0); // saturday
+        expect(obj.getOffsetColumn(DateTime(2024, 3, 2)), 1); // saturday
+        expect(obj.getOffsetColumn(DateTime(2024, 3, 9)), 2); // saturday
+        expect(obj.getOffsetColumn(DateTime(2024, 3, 10)), 3); // sunday
+        // DST boundary has been crossed. The following test will fail
+        // (by returning 2 instead of 3) if getOffsetColumn is doing date
+        // arithmetic with a duration.
+        expect(obj.getOffsetColumn(DateTime(2024, 3, 11)), 3); // monday
+      });
+      test('getOffsetColumn with dst ending', () {
+        // In the US, 2024 DST ends on 2024-11-03
+        final obj = HeatmapCalendarLocationCalclator(
+          startDate: DateTime(2024, 10, 19), // saturday
+          endedDate: DateTime(2025, 10, 19),
+          firstDay: DateTime.sunday, withUTC: false,
+        );
+        expect(obj.getOffsetColumn(DateTime(2024, 10, 19)), 0); // saturday
+        expect(obj.getOffsetColumn(DateTime(2024, 10, 26)), 1); // saturday
+        expect(obj.getOffsetColumn(DateTime(2024, 11, 2)), 2); // saturday
+        expect(obj.getOffsetColumn(DateTime(2024, 11, 3)), 3); // sunday
+        // DST boundary has been crossed. The following test will still
+        // pass even if getOffsetColumn is doing date arithmetic with a
+        // duration, because DST ending adds an extra hour to the day,
+        // causing the duration subtraction to still land in the correct week.
+        expect(obj.getOffsetColumn(DateTime(2024, 11, 4)), 3); // monday
+      });
     });
     group("api getDateWeekdyByOffsetRow", () {
       test("normal 01", () {
@@ -414,13 +447,39 @@ void main() {
             firstDay: i, withUTC: false,
           );
           for (var j = -10000; j < 10000; j++) {
-            final date = obj.startDate.add(Duration(days: j));
+            final date = obj.startDate.addDays(j);
             final row = obj.getOffsetRow(date);
             final col = obj.getOffsetColumn(date, offsetRow: row);
             // print('......$date $row $col ${obj.offsetRowWithStartDate}');
             expect(obj.getDateTimeByOffset(row, col), date);
           }
         }
+      });
+      test("with DST beginning", () {
+        /**
+         * Sat  s
+         * Sun  o
+         * Mon  x
+         * Tue  o
+         * Wed  o
+         * Tur  o
+         * Fri  o
+         */
+        // In the US, 2024 DST starts on 2024-03-10
+        final obj = HeatmapCalendarLocationCalclator(
+          startDate: DateTime(2024, 3, 9), // saturday
+          endedDate: DateTime(2025, 3, 9),
+          firstDay: DateTime.saturday, withUTC: false,
+        );
+        final date = DateTime(2024, 3, 11);
+        final row = obj.getOffsetRow(date);
+        final col = obj.getOffsetColumn(date, offsetRow: row);
+        expect(row, 2);
+        expect(col, 0);
+        // DST boundary has been crossed. The following test will fail
+        // (by returning 1:00am on 2024-03-11) if getDateTimeByOffset is doing
+        // date arithmetic with a duration.
+        expect(obj.getDateTimeByOffset(row, col), DateTime(2024, 3, 11));
       });
     });
     group('api getProtoDateByOffsetRow', () {
