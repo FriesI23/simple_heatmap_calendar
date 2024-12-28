@@ -1,5 +1,11 @@
 # Change log
 
+## 0.3.0
+
+- Update code to be compatible with Flutter 3.27
+- Add some flutter analysis options
+- Resolve issues related to crossing Daylight Saving Time boundaries. (#9)
+
 ## 0.2.0
 
 - add utc datetime support

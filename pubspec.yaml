@@ -2,7 +2,7 @@ name: simple_heatmap_calendar
 description: |
   A powerful and easy-to-use Flutter heatmap calendar package which supports
   internationalization, UTC time zone, and offers rich and adjustable options.
-version: 0.2.0
+version: 0.3.0
 homepage: https://github.com/FriesI23/simple_heatmap_calendar
 
 environment:
