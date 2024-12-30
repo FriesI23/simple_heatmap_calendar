@@ -1,5 +1,11 @@
 # Change log
 
+## 0.4.0
+
+- Revert withValues to withOpacity
+
+Upstream fixed this deprecation warning. see [here](https://github.com/dart-lang/dart-pad/pull/3065).
+
 ## 0.3.0
 
 - Update code to be compatible with Flutter 3.27
