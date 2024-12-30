@@ -54,10 +54,10 @@ class _HomePage extends State<HomePage> {
             startDate: DateTime(2020, 1, 1),
             endedDate: DateTime(2025, 12, 31),
             colorMap: {
-              10: theme.primaryColor.withValues(alpha: 0.2),
-              20: theme.primaryColor.withValues(alpha: 0.4),
-              30: theme.primaryColor.withValues(alpha: 0.6),
-              40: theme.primaryColor.withValues(alpha: 0.8),
+              10: theme.primaryColor.withOpacity(0.2),
+              20: theme.primaryColor.withOpacity(0.4),
+              30: theme.primaryColor.withOpacity(0.6),
+              40: theme.primaryColor.withOpacity(0.8),
               50: theme.primaryColor,
             },
             selectedMap: {
