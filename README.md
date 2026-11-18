@@ -2,7 +2,6 @@
 
 ![Package][pubdev-package]
 ![Likes][pubdev-likes]
-![Popularity][pubdev-popularity]
 ![Points][pubdev-points]
 
 ![banner][banner]
@@ -17,12 +16,15 @@ Powerful and easy-to-use heatmap flutter chart package.
 
 See the [runnable example](example/README.md) to explore the available options.
 
-![sc01][sc01]
-![sc02][sc02]
-![sc03][sc03]
-![sc04][sc04]
-![sc05][sc05]
-![sc06][sc06]
+## Example gallery
+
+Material 3, light/dark appearance, and live configuration:
+
+![Heatmap gallery and live playground](https://raw.githubusercontent.com/FriesI23/simple_heatmap_calendar/master/screenshots/playground.webp)
+
+Tap to add activity, or long press to edit a day:
+
+![Interactive heatmap and value editor](https://raw.githubusercontent.com/FriesI23/simple_heatmap_calendar/master/screenshots/interaction.webp)
 
 ## Requirements
 
@@ -170,15 +172,8 @@ SOFTWARE.
 
 [pubdev-package]: https://img.shields.io/pub/v/simple_heatmap_calendar.svg
 [pubdev-likes]: https://img.shields.io/pub/likes/simple_heatmap_calendar?logo=dart
-[pubdev-popularity]: https://img.shields.io/pub/popularity/simple_heatmap_calendar?logo=dart
 [pubdev-points]: https://img.shields.io/pub/points/simple_heatmap_calendar?logo=dart
 [banner]: https://user-images.githubusercontent.com/20661034/224279041-833335b9-70c5-41b9-826b-0214ac525b6b.png
-[sc01]: https://user-images.githubusercontent.com/20661034/224278286-08dde6be-2e6d-4f9e-a732-07add1842c6c.gif
-[sc02]: https://user-images.githubusercontent.com/20661034/224278425-5ea1b21f-290c-44d1-8e92-e919ef1fc82e.gif
-[sc03]: https://user-images.githubusercontent.com/20661034/224278429-7cf7c8cb-2f55-4cae-b71a-cdbc1a4342be.gif
-[sc04]: https://user-images.githubusercontent.com/20661034/224278619-21b04340-2d74-48cc-a0c5-06c67f35cf47.gif
-[sc05]: https://user-images.githubusercontent.com/20661034/224278631-2855d819-f51e-451a-aaf1-b0e2d18507db.gif
-[sc06]: https://user-images.githubusercontent.com/20661034/224278416-37524f10-08b9-4c51-aa19-5e52f0d69e38.gif
 [buymeacoffee-badge]: https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black
 [alipay-badge]: https://img.shields.io/badge/alipay-00A1E9?style=for-the-badge&logo=alipay&logoColor=white
 [alipay-addr]: https://raw.githubusercontent.com/FriesI23/mhabit/main/docs/README/images/donate-alipay.jpg

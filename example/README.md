@@ -1,7 +1,12 @@
 # Simple Heatmap Calendar example
 
-Material examples covering basic options, font scaling, interaction,
-localization, and custom builders. Uses Flutter 3.47.9 from the repository's FVM pin.
+A small Material 3 gallery with light/dark appearance and five focused demos:
+
+- **Basics:** defaults, labels, legends, and fitting a year to the available width.
+- **Text scaling:** grow cells with the text scale.
+- **Interaction:** tap to add activity, long press to edit a day, and reset the data.
+- **Localization:** switch English/Chinese or override a single calendar's locale.
+- **Playground:** adjust dates, cell geometry, labels, clipping, and custom builders.
 
 ## Run
 
@@ -15,15 +20,29 @@ cd example
 fvm flutter run
 ```
 
-Use `-t lib/simple_example.dart` for the smaller example. The palette button
-switches Material 2 / 3; the localization page switches English / Chinese.
+The toolbar toggles light/dark appearance. Material 3 is always enabled.
+Use `-t lib/simple_example.dart` for the minimal standalone example.
+
+## Source
+
+`lib/main.dart` starts the app. `lib/app.dart` owns the theme and locale;
+`lib/gallery_page.dart` presents the demos. Individual examples live in
+`lib/demos/`, with sample data and small presentation helpers in `lib/shared/`.
+State is local to each demo; no external state-management package is required.
+Sample dates are fixed in 2023 so the same data appears on every run.
 
 ## Development
 
 Run `make check` from the repository root. After editing `lib/l10n/*.arb`,
-run `make gen` to regenerate localizations.
+run `make gen`; do not edit generated localization files.
 
-From this directory, build with the installed platform toolchains:
+To regenerate the README's compressed, looping WebP animations, install the WebP
+command-line tools (`img2webp`) and run `make capture-demos` from the repository
+root. The scenarios render actual widgets and exercise their gestures. Raw frames
+stay in `build/example-demos/`, and `screenshots/.pubignore` excludes the animations
+from pub.dev packages.
+
+Build with the installed platform toolchains:
 
 ```sh
 fvm flutter build web --release

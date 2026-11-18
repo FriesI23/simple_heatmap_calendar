@@ -15,10 +15,8 @@ dependencies:
     sdk: flutter
   intl: ^0.20.2
   material_ui: ^1.11.1
-  provider: ^6.0.5
   simple_heatmap_calendar:
     path: ../
-  tuple: ^2.0.1
 
 dev_dependencies:
   flutter_test:
