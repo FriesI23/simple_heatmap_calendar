@@ -9,7 +9,7 @@ issue_tracker: https://github.com/FriesI23/simple_heatmap_calendar/issues
 
 environment:
   sdk: ^3.13.0
-  flutter: '>=3.47.9'
+  flutter: '>=3.47.0'
 
 dependencies:
   flutter:

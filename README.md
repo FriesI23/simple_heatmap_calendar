@@ -28,7 +28,7 @@ Tap to add activity, or long press to edit a day:
 
 ## Requirements
 
-Requires **Flutter 3.47.9 / Dart 3.13 or newer**.
+Requires **Flutter 3.47.0 / Dart 3.13 or newer**.
 Material components use `material_ui`; host UI and themes must use the same
 standalone package. See Flutter's [migration guide](https://docs.flutter.dev/release/breaking-changes/material-ui-and-cupertino-ui).
 
