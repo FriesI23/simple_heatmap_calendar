@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- **Breaking:** Remove the direct `intl` dependency. Labels default to English;
+  use label formatters for localization. Label builder arguments and exported
+  label widget APIs changed; see [migration](README.md#migration).
 - **Breaking:** Require Flutter 3.47.9 / Dart 3.13 and migrate the calendar to
   `material_ui`. Host apps, themes, and custom Material builders must use the
   standalone Material package.

@@ -4,6 +4,7 @@ import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
 import '../shared/demo_data.dart';
 import '../shared/demo_widgets.dart';
+import '../shared/label_formatters.dart';
 
 class TappableHeatmapPage extends StatefulWidget {
   const TappableHeatmapPage({super.key});
@@ -89,6 +90,8 @@ class _TappableHeatmapPageState extends State<TappableHeatmapPage> {
       DemoCard(
         title: 'Activity editor',
         child: HeatmapCalendar<num>(
+          weekLabelFormatter: intlWeekLabelFormatter,
+          monthLabelFormatter: intlMonthLabelFormatter,
           startDate: DateTime(2023, 1, 1),
           endedDate: DateTime(2023, 3, 31),
           firstDay: DateTime.monday,

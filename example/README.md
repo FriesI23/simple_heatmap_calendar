@@ -31,6 +31,9 @@ Use `-t lib/simple_example.dart` for the minimal standalone example.
 State is local to each demo; no external state-management package is required.
 Sample dates are fixed in 2023 so the same data appears on every run.
 
+The gallery uses app-owned `intl` formatters in `lib/shared/label_formatters.dart`
+and delegates to initialize locale data. The minimal example uses English defaults.
+
 ## Development
 
 Run `make check` from the repository root. After editing `lib/l10n/*.arb`,

@@ -61,6 +61,13 @@ void main() {
     await tester.pumpAndSettle();
     await openDemo(tester, 'localization');
     expect(find.text('Less'), findsOneWidget);
+    Finder months(HeatmapCalendar<num> calendar, String text) =>
+        find.descendant(of: find.byWidget(calendar), matching: find.text(text));
+    final calendars = tester
+        .widgetList<HeatmapCalendar<num>>(find.byType(HeatmapCalendar<num>))
+        .toList();
+    expect(months(calendars.first, 'Jan 2023'), findsOneWidget);
+    expect(months(calendars.last, '2023年1月'), findsOneWidget);
     await tester.tap(find.text('中文'));
     await tester.pumpAndSettle();
     BuildContext context() => tester.element(find.byType(L10nPage));
@@ -68,10 +75,14 @@ void main() {
     expect(MaterialLocalizations.of(context()).backButtonTooltip, '返回');
     expect(find.text('更少'), findsOneWidget);
     expect(find.text('更多'), findsOneWidget);
+    expect(find.text('Jan 2023'), findsNothing);
+    expect(find.text('2023年1月'), findsNWidgets(2));
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(MaterialLocalizations.of(context()).backButtonTooltip, 'Back');
     expect(find.text('Less'), findsOneWidget);
+    expect(find.text('Jan 2023'), findsOneWidget);
+    expect(find.text('2023年1月'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

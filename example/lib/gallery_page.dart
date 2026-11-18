@@ -8,6 +8,7 @@ import 'demos/localization_page.dart';
 import 'demos/text_scale_page.dart';
 import 'shared/demo_data.dart';
 import 'shared/demo_widgets.dart';
+import 'shared/label_formatters.dart';
 
 class GalleryPage extends StatelessWidget {
   const GalleryPage({
@@ -109,6 +110,8 @@ class GalleryPage extends StatelessWidget {
                   DemoCard(
                     title: '2023 activity',
                     child: HeatmapCalendar<num>(
+                      weekLabelFormatter: intlWeekLabelFormatter,
+                      monthLabelFormatter: intlMonthLabelFormatter,
                       startDate: DateTime(2023, 1, 1),
                       endedDate: DateTime(2023, 12, 31),
                       firstDay: DateTime.monday,

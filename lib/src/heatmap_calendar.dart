@@ -2,10 +2,10 @@ import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
-import 'package:intl/intl.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'const.dart';
+import 'label_formatters.dart';
 import 'utils.dart';
 import 'widget/cellitem.dart';
 import 'widget/colortip.dart';
@@ -17,13 +17,13 @@ typedef ValueBuilder = Widget? Function(BuildContext context, int? dateDay);
 typedef WeekLabelValueBuilder = Widget? Function(
   BuildContext context,
   DateTime protoDate,
-  String defaultFormat,
+  String defaultText,
 );
 
 typedef MonthLabelValueBuilder = Widget? Function(
   BuildContext context,
   DateTime date,
-  String defaultFormat,
+  String defaultText,
 );
 
 typedef CellItemBuilder = Widget? Function(
@@ -259,9 +259,20 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   ///      valueColorMap = {0: Colors.Black, 10: Colors.white}
   final Map<T, Color>? valueColorMap;
 
-  /// i18n, also see flutter docs [Internationalizing Flutter apps] or
-  /// example in `example/lib/page_localization.dart`;
+  /// Locale passed to [weekLabelFormatter] and [monthLabelFormatter].
+  ///
+  /// Defaults to the surrounding [Localizations] locale. The default formatters
+  /// produce English labels; supply custom formatters for localized labels.
   final Locale? locale;
+
+  /// Formats weekday label text before [weekLabelValueBuilder] is called.
+  final WeekLabelFormatter weekLabelFormatter;
+
+  /// Formats month label text before [monthLabelItemBuilder] is called.
+  ///
+  /// The formatter receives whether to show the year, based on the month and
+  /// [HeatmapCalendarStyle.showYearOnMonthLabel].
+  final MonthLabelFormatter monthLabelFormatter;
 
   /// Heatmap style options, see [HeatmapCalendarStyle]
   final HeatmapCalendarStyle? style;
@@ -321,7 +332,7 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   /// ```dart
   /// cellBuilder: (context, childBuilder, columnIndex, rowIndex, date) {
   ///   return Tooltip(
-  ///     message: "${DateFormat('yyyy-MM-dd').format(date)} value: $value",
+  ///     message: "${date.toIso8601String()} value: $value",
   ///     waitDuration: const Duration(seconds: 1),
   ///     child: childBuilder(
   ///       context,
@@ -336,20 +347,20 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
   /// ```
   final CellItemBuilder? cellBuilder;
 
-  /// Customn month label builder
+  /// Custom month label builder. The third argument is the formatted label text.
   /// e.g.
   /// ```dart
-  /// monthLabelItemBuilder: (context, data, format) {
-  ///   return Text(DateFormat(DateFormat.YEAR_MONTH).format(data));
+  /// monthLabelItemBuilder: (context, date, defaultText) {
+  ///   return Text(defaultText.toUpperCase());
   /// }
   /// ```
   final MonthLabelValueBuilder? monthLabelItemBuilder;
 
-  /// Custom week label builder
+  /// Custom week label builder. The third argument is the formatted label text.
   /// e.g.
   /// ```dart
-  /// weekLabelValueBuilder: (context, data, format) {
-  ///   Text(DateFormat('cccc', myLocale).format(protoDate));
+  /// weekLabelValueBuilder: (context, date, defaultText) {
+  ///   return Text(defaultText.toUpperCase());
   /// }
   /// ```
   final WeekLabelValueBuilder? weekLabelValueBuilder;
@@ -364,6 +375,8 @@ class HeatmapCalendar<T extends Comparable<T>> extends StatefulWidget {
     this.colorMap,
     this.valueColorMap,
     this.locale,
+    this.weekLabelFormatter = defaultWeekLabelFormatter,
+    this.monthLabelFormatter = defaultMonthLabelFormatter,
     this.style,
     this.cellSize = defaultCellSize,
     this.cellSpaceBetween = defualtCellSpaceBetween,
@@ -426,9 +439,6 @@ class _HeatmapCalendar<T extends Comparable<T>>
   ) {
     return (cellSpaceBetween + width) ~/ (cellWidth + cellSpaceBetween);
   }
-
-  String get localeName =>
-      (widget.locale ?? Localizations.localeOf(context)).toString();
 
   Map<DateTime, T>? get selectedMap => widget.selectedMap;
 
@@ -831,7 +841,8 @@ class _HeatmapCalendar<T extends Comparable<T>>
                 weekLabelLocation == CalendarWeekLabelPosition.right)) {
           return WeekLabelColumn(
             model: model,
-            format: DateFormat(defaultWeekLabelDateFormatter, localeName),
+            locale: widget.locale,
+            formatter: widget.weekLabelFormatter,
             valueColor: userStyle?.weekLabelColor ?? style.weekLabelColor,
             valueAlignment:
                 userStyle?.weekLabelValueAlignment ??
@@ -914,15 +925,10 @@ class _HeatmapCalendar<T extends Comparable<T>>
           labelTextSizeMultiple:
               userStyle?.monthLabelTextSizeMultiple ??
               style.monthLabelTextSizeMultiple!,
-          getFormat: (date) {
-            final formatter =
-                date.month == 1 &&
-                    (userStyle?.showYearOnMonthLabel ??
-                        style.showYearOnMonthLabel)
-                ? "yMMM"
-                : "MMM";
-            return DateFormat(formatter, localeName);
-          },
+          locale: widget.locale,
+          formatter: widget.monthLabelFormatter,
+          showYearOnMonthLabel:
+              userStyle?.showYearOnMonthLabel ?? style.showYearOnMonthLabel,
           getCellPadding: (columnIndex) => getCellPadding(columnIndex, 0),
           monthLabelItemBuilder: widget.monthLabelItemBuilder,
         ),

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 
 import '../heatmap_calendar.dart';
+import '../label_formatters.dart';
 import '../utils.dart';
 
 class MonthLabelItem extends StatelessWidget {
@@ -11,7 +11,9 @@ class MonthLabelItem extends StatelessWidget {
   final EdgeInsetsGeometry padding;
   final double? innderWidth;
   final double? innderHeight;
-  final DateFormat format;
+
+  /// Formatted text passed to [monthLabelItemBuilder] and used by default.
+  final String label;
   final MonthLabelValueBuilder? monthLabelItemBuilder;
 
   const MonthLabelItem({
@@ -22,7 +24,7 @@ class MonthLabelItem extends StatelessWidget {
     required this.padding,
     this.innderWidth,
     this.innderHeight,
-    required this.format,
+    required this.label,
     this.monthLabelItemBuilder,
   });
 
@@ -39,12 +41,7 @@ class MonthLabelItem extends StatelessWidget {
             fontSize: monthLabelFontSize,
           ),
           child:
-              monthLabelItemBuilder?.call(
-                context,
-                date,
-                format.pattern ?? '',
-              ) ??
-              Text(format.format(date)),
+              monthLabelItemBuilder?.call(context, date, label) ?? Text(label),
         ),
       ),
     );
@@ -60,7 +57,11 @@ class MonthLabelRow extends StatelessWidget {
   final Color? monthLabelColor;
   final double? monthLabelFontSize;
   final int labelTextSizeMultiple;
-  final DateFormat Function(DateTime date)? getFormat;
+
+  /// Locale passed to [formatter], defaulting to the surrounding locale or en.
+  final Locale? locale;
+  final MonthLabelFormatter formatter;
+  final bool showYearOnMonthLabel;
   final EdgeInsets Function(int columnIndex)? getCellPadding;
   final MonthLabelValueBuilder? monthLabelItemBuilder;
 
@@ -74,13 +75,17 @@ class MonthLabelRow extends StatelessWidget {
     this.monthLabelColor,
     this.monthLabelFontSize,
     this.labelTextSizeMultiple = 3,
-    this.getFormat,
+    this.locale,
+    this.formatter = defaultMonthLabelFormatter,
+    this.showYearOnMonthLabel = true,
     this.getCellPadding,
     this.monthLabelItemBuilder,
   }) : assert(labelTextSizeMultiple > 0);
 
   @override
   Widget build(BuildContext context) {
+    final effectiveLocale =
+        locale ?? Localizations.maybeLocaleOf(context) ?? const Locale('en');
     final dateMap = <int, DateTime>{};
     if (model.startDate.day == 1) {
       dateMap[model.getOffsetColumn(model.startDate)] = model.startDate;
@@ -111,7 +116,11 @@ class MonthLabelRow extends StatelessWidget {
       if (dateMap.containsKey(columnIndex) &&
           (columns - columnIndex) >= labelTextSizeMultiple) {
         final date = dateMap[columnIndex]!;
-        final format = getFormat?.call(date) ?? DateFormat.yM();
+        final label = formatter(
+          date,
+          effectiveLocale,
+          showYear: date.month == DateTime.january && showYearOnMonthLabel,
+        );
         children.add(
           MonthLabelItem(
             date: date,
@@ -121,7 +130,7 @@ class MonthLabelRow extends StatelessWidget {
             innderWidth:
                 cellSize.width * labelTextSizeMultiple +
                 cellSpaceBetween * (labelTextSizeMultiple - 1),
-            format: format,
+            label: label,
             monthLabelItemBuilder: monthLabelItemBuilder,
           ),
         );

@@ -4,6 +4,7 @@ import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 import '../l10n/localizations.dart';
 import '../shared/demo_data.dart';
 import '../shared/demo_widgets.dart';
+import '../shared/label_formatters.dart';
 
 class L10nPage extends StatelessWidget {
   const L10nPage({super.key, required this.onLocaleChanged});
@@ -16,6 +17,8 @@ class L10nPage extends StatelessWidget {
     bool legend = true,
   }) => HeatmapCalendar<num>(
     locale: locale,
+    weekLabelFormatter: intlWeekLabelFormatter,
+    monthLabelFormatter: intlMonthLabelFormatter,
     startDate: DateTime(2023, 1, 1),
     endedDate: DateTime(2023, 4, 30),
     firstDay: DateTime.monday,
@@ -34,7 +37,7 @@ class L10nPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DemoScaffold(
     title: 'Localization',
-    description: 'Calendar labels follow the app locale. A calendar can also override its locale independently.',
+    description: 'App-provided formatters localize calendar labels. A calendar can also override its locale independently.',
     children: [
       DemoCard(
         title: 'App language',

@@ -4,6 +4,7 @@ import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
 import '../shared/demo_data.dart';
 import '../shared/demo_widgets.dart';
+import '../shared/label_formatters.dart';
 
 class CustomHeatmapPage extends StatefulWidget {
   const CustomHeatmapPage({super.key});
@@ -63,6 +64,11 @@ class _CustomHeatmapPageState extends State<CustomHeatmapPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         HeatmapCalendar<num>(
+          weekLabelFormatter: _customLabels
+              ? (date, locale) =>
+                    DateFormat('EEE', locale.toString()).format(date)
+              : intlWeekLabelFormatter,
+          monthLabelFormatter: intlMonthLabelFormatter,
           key: const ValueKey('playground-calendar'),
           controller: _controller,
           startDate: _range.start,
@@ -90,20 +96,10 @@ class _CustomHeatmapPageState extends State<CustomHeatmapPage> {
               ? Size(_cellSize * 2, _cellSize)
               : null,
           weekLabelValueBuilder: _customLabels
-              ? (context, date, format) => Text(
-                  DateFormat(
-                    'EEE',
-                    Localizations.localeOf(context).toLanguageTag(),
-                  ).format(date).toUpperCase(),
-                )
+              ? (context, date, defaultText) => Text(defaultText.toUpperCase())
               : null,
           monthLabelItemBuilder: _customLabels
-              ? (context, date, format) => Text(
-                  DateFormat(
-                    'MMM',
-                    Localizations.localeOf(context).toLanguageTag(),
-                  ).format(date).toUpperCase(),
-                )
+              ? (context, date, defaultText) => Text(defaultText.toUpperCase())
               : null,
           cellBuilder: (context, childBuilder, column, row, date) => Tooltip(
             message: DateFormat.yMMMd().format(date),

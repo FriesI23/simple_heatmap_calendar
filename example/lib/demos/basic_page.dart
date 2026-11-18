@@ -3,6 +3,7 @@ import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
 import '../shared/demo_data.dart';
 import '../shared/demo_widgets.dart';
+import '../shared/label_formatters.dart';
 
 class BasicHeatmapPage extends StatelessWidget {
   const BasicHeatmapPage({super.key});
@@ -15,6 +16,8 @@ class BasicHeatmapPage extends StatelessWidget {
       DemoCard(
         title: 'Default calendar',
         child: HeatmapCalendar<num>(
+          weekLabelFormatter: intlWeekLabelFormatter,
+          monthLabelFormatter: intlMonthLabelFormatter,
           startDate: DateTime(2023, 1, 1),
           endedDate: DateTime(2023, 4, 10),
           selectedMap: sampleYearData,
@@ -27,6 +30,8 @@ class BasicHeatmapPage extends StatelessWidget {
       DemoCard(
         title: 'Labels and legend',
         child: HeatmapCalendar<num>(
+          weekLabelFormatter: intlWeekLabelFormatter,
+          monthLabelFormatter: intlMonthLabelFormatter,
           startDate: DateTime(2023, 1, 1),
           endedDate: DateTime(2023, 12, 31),
           firstDay: DateTime.monday,
@@ -48,6 +53,8 @@ class BasicHeatmapPage extends StatelessWidget {
         description:
             'Resize the window to see the same year scale automatically.',
         child: HeatmapCalendar<num>(
+          weekLabelFormatter: intlWeekLabelFormatter,
+          monthLabelFormatter: intlMonthLabelFormatter,
           startDate: DateTime(2023, 1, 1),
           endedDate: DateTime(2023, 12, 31),
           selectedMap: sampleYearData,

@@ -10,7 +10,7 @@ Powerful and easy-to-use heatmap flutter chart package.
 
 ## Features
 
-- support intl.
+- customizable localized labels without a direct `intl` dependency.
 - various configuration choices.
 - has better performance when dealing with a large time span on the calendar.
 
@@ -133,6 +133,44 @@ class _HomePage extends State<HomePage> {
 }
 
 ```
+
+## Localized labels
+
+Labels default to English. Formatters receive the calendar's `locale` or follow
+the app locale. For localization with an app-owned `intl` dependency:
+
+```dart
+import 'package:intl/intl.dart'; // Add intl to the app's dependencies.
+
+HeatmapCalendar<num>(
+  startDate: DateTime(2023, 1, 1),
+  endedDate: DateTime(2023, 12, 31),
+  weekLabelFormatter: (date, locale) =>
+      DateFormat('ccccc', locale.toString()).format(date),
+  monthLabelFormatter: (date, locale, {required showYear}) =>
+      DateFormat(showYear ? 'yMMM' : 'MMM', locale.toString()).format(date),
+  layoutParameters: const HeatmapLayoutParameters.defaults(
+    monthLabelPosition: CalendarMonthLabelPosition.top,
+    weekLabelPosition: CalendarWeekLabelPosition.left,
+  ),
+)
+```
+
+Initialize locale data through app delegates or `initializeDateFormatting`.
+Other formatting libraries or app translations also work. `material_ui` still
+depends on `intl`; this package adds no direct version constraint.
+
+### Migration
+
+- `weekLabelValueBuilder` and `monthLabelItemBuilder` now receive
+  `(context, date, defaultText)`: formatted text replaces the date pattern.
+- `MonthLabelItem.format` → `label` (text); `MonthLabelRow.getFormat` and
+  `WeekLabelColumn.format` → `formatter` (callbacks shown above).
+- Both row/column widgets accept `locale`. `MonthLabelRow` now defaults to
+  English month abbreviations and shows the year in January unless
+  `showYearOnMonthLabel` is false.
+- Remove `defaultWeekLabelDateFormatter` and `WeekLabelItem.dateFormatter`;
+  the week builder receives `value` as its default text.
 
 ## Donate
 
