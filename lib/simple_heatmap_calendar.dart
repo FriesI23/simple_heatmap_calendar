@@ -1,4 +1,4 @@
-library simple_heatmap_calendar;
+library;
 
 export 'src/const.dart' hide maxDayOfWeek;
 export 'src/heatmap_calendar.dart'

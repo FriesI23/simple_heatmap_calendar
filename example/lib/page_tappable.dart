@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 import 'package:tuple/tuple.dart';
@@ -14,7 +14,7 @@ class SelectDateColProvider extends ChangeNotifier {
   num getValue(DateTime date) => _data[date] ?? 0;
 
   void changeValue(DateTime date, num value) {
-    var orgValue = _data[date];
+    final orgValue = _data[date];
     if (orgValue != value) {
       _data[date] = value;
       notifyListeners();
@@ -37,12 +37,10 @@ class HeatmapStatusChangeProvider extends ChangeNotifier {
   bool _showText;
 
   HeatmapStatusChangeProvider({
-    bool tappable = true,
-    bool canScroll = true,
-    bool showText = false,
-  })  : _tappable = tappable,
-        _canScroll = canScroll,
-        _showText = showText;
+    this._tappable = true,
+    this._canScroll = true,
+    this._showText = false,
+  });
 
   bool get tappable => _tappable;
   set tappable(bool newStatus) {
@@ -105,8 +103,8 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
   }
 
   Widget _buildHeatmap(BuildContext context) {
-    var vm = context.read<SelectDateColProvider>();
-    var svm = context.read<HeatmapStatusChangeProvider>();
+    final vm = context.read<SelectDateColProvider>();
+    final svm = context.read<HeatmapStatusChangeProvider>();
     return HeatmapCalendar<num>(
       startDate: DateTime(2023, 1, 1),
       endedDate: DateTime(2023, 12, 29),
@@ -118,10 +116,7 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
         40: Colors.red.shade700,
         50: Colors.red.shade900,
       },
-      valueColorMap: const {
-        20: Colors.black12,
-        30: Colors.white,
-      },
+      valueColorMap: const {20: Colors.black12, 30: Colors.white},
       colorTipNum: 4,
       colorTipCellSize: const Size(16.0, 16.0),
       layoutParameters: const HeatmapLayoutParameters.defaults(
@@ -145,7 +140,7 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
           context.read<SelectDateColProvider>().onPressedAddValue(date);
         },
         onCellLongPressed: (date, value) async {
-          var result = await showDialog<num>(
+          final result = await showDialog<num>(
             context: context,
             builder: (context) => _buildChangeValueDialog(context, value),
           );
@@ -171,7 +166,7 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
                 context,
                 valueBuilder: (context, dateDay) {
                   if (dateDay == null) return null;
-                  var n = vm.data[date];
+                  final n = vm.data[date];
                   return Text((n ?? 0).toString());
                 },
               ),
@@ -185,9 +180,7 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Workaround when font scale changed"),
-      ),
+      appBar: AppBar(title: const Text("Workaround when font scale changed")),
       body: MultiProvider(
         providers: [
           ChangeNotifierProvider<SelectDateColProvider>(
@@ -215,8 +208,10 @@ class _TappableHeatmapPage extends State<TappableHeatmapPage> {
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   children: [
-                    Selector<HeatmapStatusChangeProvider,
-                        Tuple3<bool, bool, bool>>(
+                    Selector<
+                      HeatmapStatusChangeProvider,
+                      Tuple3<bool, bool, bool>
+                    >(
                       selector: (context, vm) =>
                           Tuple3(vm.tappable, vm.canScroll, vm.showText),
                       shouldRebuild: (previous, next) => previous != next,

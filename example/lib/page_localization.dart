@@ -1,7 +1,7 @@
-import 'package:example/l10n/localizations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
+import 'l10n/localizations.dart';
 import 'main.dart';
 
 class L10nPage extends StatefulWidget {
@@ -12,10 +12,13 @@ class L10nPage extends StatefulWidget {
 }
 
 class _L10nPage extends State<L10nPage> {
-  Widget _buildHeatmap(BuildContext context,
-      {Locale? locale, bool showColorTip = true}) {
-    var colorTipLeftHelperText = L10n.of(context)?.colorTipLeftHelperText;
-    var colorTipRightHelperText = L10n.of(context)?.colorTipRightHelperText;
+  Widget _buildHeatmap(
+    BuildContext context, {
+    Locale? locale,
+    bool showColorTip = true,
+  }) {
+    final colorTipLeftHelperText = L10n.of(context)?.colorTipLeftHelperText;
+    final colorTipRightHelperText = L10n.of(context)?.colorTipRightHelperText;
     return HeatmapCalendar<num>(
       locale: locale,
       startDate: DateTime(2020, 1, 3),
@@ -39,9 +42,7 @@ class _L10nPage extends State<L10nPage> {
         weekLabelPosition: CalendarWeekLabelPosition.right,
         colorTipPosition: showColorTip ? CalendarColorTipPosition.bottom : null,
       ),
-      style: const HeatmapCalendarStyle.defaults(
-        colorTipPosOffset: 30,
-      ),
+      style: const HeatmapCalendarStyle.defaults(colorTipPosOffset: 30),
       switchParameters: const HeatmapSwitchParameters.defaults(
         showCellText: true,
       ),
@@ -54,8 +55,9 @@ class _L10nPage extends State<L10nPage> {
         DateTime(2023, 4, 6): 42,
         DateTime(2023, 4, 7): 999,
       },
-      colorTipLeftHelper:
-          colorTipLeftHelperText != null ? Text(colorTipLeftHelperText) : null,
+      colorTipLeftHelper: colorTipLeftHelperText != null
+          ? Text(colorTipLeftHelperText)
+          : null,
       colorTipRightHelper: colorTipRightHelperText != null
           ? Text(colorTipRightHelperText)
           : null,
@@ -68,34 +70,29 @@ class _L10nPage extends State<L10nPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("L10n"),
-      ),
+      appBar: AppBar(title: const Text("L10n")),
       body: ListView(
         children: [
           Card(
             child: Padding(
               padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  _buildHeatmap(context),
-                ],
-              ),
+              child: Column(children: [_buildHeatmap(context)]),
             ),
           ),
-          RadioListTile<Locale>(
-            title: const Text('English'),
-            value: const Locale('en'),
+          RadioGroup<Locale>(
             groupValue: Localizations.localeOf(context),
-            onChanged: (value) =>
-                value != null ? MyApp.setLocale(context, value) : null,
-          ),
-          RadioListTile<Locale>(
-            title: const Text('中文'),
-            value: const Locale('zh'),
-            groupValue: Localizations.localeOf(context),
-            onChanged: (value) =>
-                value != null ? MyApp.setLocale(context, value) : null,
+            onChanged: (value) {
+              if (value != null) MyApp.setLocale(context, value);
+            },
+            child: const Column(
+              children: [
+                RadioListTile<Locale>(
+                  title: Text('English'),
+                  value: Locale('en'),
+                ),
+                RadioListTile<Locale>(title: Text('中文'), value: Locale('zh')),
+              ],
+            ),
           ),
           Card(
             child: Padding(
@@ -103,8 +100,11 @@ class _L10nPage extends State<L10nPage> {
               child: Column(
                 children: [
                   const Text("specify region"),
-                  _buildHeatmap(context,
-                      locale: const Locale('zh'), showColorTip: false),
+                  _buildHeatmap(
+                    context,
+                    locale: const Locale('zh'),
+                    showColorTip: false,
+                  ),
                 ],
               ),
             ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 const defaultCellBorderRadius = BorderRadius.all(Radius.circular(2.0));
 const defaultCellSize = Size.square(24.0);

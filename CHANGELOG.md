@@ -1,5 +1,14 @@
 # Change log
 
+## Unreleased
+
+- **Breaking:** Require Flutter 3.47.9 / Dart 3.13 and migrate the calendar to
+  `material_ui`. Host apps, themes, and custom Material builders must use the
+  standalone Material package.
+- Adapt the example, localization setup, and native runners to Flutter 3.47.9.
+- Add shared Makefile and CI gates for analysis, formatting, package and example
+  tests, Web builds, and pub.dev validation.
+
 ## 0.4.0
 
 - Revert withValues to withOpacity

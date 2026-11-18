@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
@@ -58,21 +58,31 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
   }
 
   Widget _customWeekLabelValueBuilder(
-      BuildContext context, DateTime protoDate, String defaultFormat) {
+    BuildContext context,
+    DateTime protoDate,
+    String defaultFormat,
+  ) {
     return FittedBox(
       fit: BoxFit.fill,
-      child: Text(DateFormat('cccc', Localizations.localeOf(context).toString())
-          .format(protoDate)),
+      child: Text(
+        DateFormat(
+          'cccc',
+          Localizations.localeOf(context).toString(),
+        ).format(protoDate),
+      ),
     );
   }
 
   Widget _customMonthLabelValueBuilder(
-      BuildContext context, DateTime data, String defaultFormat) {
+    BuildContext context,
+    DateTime data,
+    String defaultFormat,
+  ) {
     return Text(DateFormat(DateFormat.YEAR_MONTH).format(data));
   }
 
   Widget _buildHeatmap(BuildContext context) {
-    var data = context.read<_CustomProvider>();
+    final data = context.read<_CustomProvider>();
     return HeatmapCalendar<num>(
       controller: _controller,
       startDate: data.startDate,
@@ -81,8 +91,9 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
       cellSize: Size.square(data.cellSize),
       cellSpaceBetween: data.cellSpaceBetween,
       weekLabelSpaceBetweenHeatmap: data.weekLabelSpaceBetweenHeatmap,
-      colorTipCellSize:
-          data.useColorTipCellSize ? Size.square(data.colorTipCellSize) : null,
+      colorTipCellSize: data.useColorTipCellSize
+          ? Size.square(data.colorTipCellSize)
+          : null,
       colorTipCellBetweem: data.useColorTipCellBetweem
           ? data.colorTipCellBetweem
           : data.cellSpaceBetween,
@@ -109,11 +120,13 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
       ),
       style: HeatmapCalendarStyle.defaults(
         colorTipPosOffset: 30,
-        weekLabelValueAlignment:
-            data.expandWeekLabel ? Alignment.centerLeft : null,
+        weekLabelValueAlignment: data.expandWeekLabel
+            ? Alignment.centerLeft
+            : null,
         cellRadius: BorderRadius.all(Radius.circular(data.cellRadius)),
-        monthLabelFontSize:
-            data.monthLabelFontSize > 0 ? data.monthLabelFontSize : null,
+        monthLabelFontSize: data.monthLabelFontSize > 0
+            ? data.monthLabelFontSize
+            : null,
         monthLabelTextSizeMultiple: data.monthLabelTextSizeMultiple,
       ),
       switchParameters: HeatmapSwitchParameters.defaults(
@@ -137,15 +150,17 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
         );
       },
       weekLabalCellSize: data.expandWeekLabelSize,
-      weekLabelValueBuilder:
-          data.expandWeekLabel ? _customWeekLabelValueBuilder : null,
-      monthLabelItemBuilder:
-          data.expandMonthLabel ? _customMonthLabelValueBuilder : null,
+      weekLabelValueBuilder: data.expandWeekLabel
+          ? _customWeekLabelValueBuilder
+          : null,
+      monthLabelItemBuilder: data.expandMonthLabel
+          ? _customMonthLabelValueBuilder
+          : null,
     );
   }
 
   Widget _buildOptions(BuildContext context) {
-    var data = context.read<_CustomProvider>();
+    final data = context.read<_CustomProvider>();
     return ListView(
       children: [
         const SizedBox(height: 20),
@@ -156,9 +171,11 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           children: [
             ElevatedButton.icon(
               onPressed: () {
-                _controller.animateTo(_controller.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutQuart);
+                _controller.animateTo(
+                  _controller.position.maxScrollExtent,
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutQuart,
+                );
               },
               icon: const Icon(Icons.arrow_left),
               label: const Text("to ended"),
@@ -201,9 +218,11 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
             ),
             ElevatedButton.icon(
               onPressed: () {
-                _controller.animateTo(_controller.position.minScrollExtent,
-                    duration: const Duration(milliseconds: 1000),
-                    curve: Curves.easeOutQuart);
+                _controller.animateTo(
+                  _controller.position.minScrollExtent,
+                  duration: const Duration(milliseconds: 1000),
+                  curve: Curves.easeOutQuart,
+                );
               },
               icon: const Icon(Icons.arrow_right),
               label: const Text("to start"),
@@ -269,7 +288,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           subtitle: Text(data.startDate.toString()),
           leading: const Icon(Icons.calendar_today),
           onTap: () async {
-            var result = await showDatePicker(
+            final result = await showDatePicker(
               context: context,
               initialDate: data.startDate,
               firstDate: DateTime(2000, 1, 1),
@@ -289,7 +308,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           subtitle: Text(data.endedData.toString()),
           leading: const Icon(Icons.calendar_month),
           onTap: () async {
-            var result = await showDatePicker(
+            final result = await showDatePicker(
               context: context,
               initialDate: data.endedData,
               firstDate: data.startDate,
@@ -309,7 +328,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           subtitle: Text(data.firstDay.toString()),
           leading: const Icon(Icons.calendar_view_day),
           onTap: () async {
-            var result = await showDialog<int>(
+            final result = await showDialog<int>(
               context: context,
               builder: (context) => SimpleDialog(
                 title: const Text('select'),
@@ -345,7 +364,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
                     child: const Text('Saturday'),
                     onPressed: () =>
                         Navigator.of(context).pop(DateTime.saturday),
-                  )
+                  ),
                 ],
               ),
             );
@@ -417,7 +436,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
             }),
           ),
           value: data.useColorTipCellSize,
-          onChanged: (bool value) => setState(() {
+          onChanged: (value) => setState(() {
             data.useColorTipCellSize = value;
           }),
         ),
@@ -436,7 +455,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
             }),
           ),
           value: data.useColorTipCellBetweem,
-          onChanged: (bool value) => setState(() {
+          onChanged: (value) => setState(() {
             data.useColorTipCellBetweem = value;
           }),
         ),
@@ -446,7 +465,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           secondary: const Icon(Icons.architecture),
           subtitle: Text(data.topColorTip.toString()),
           value: data.topColorTip,
-          onChanged: (bool value) => setState(() {
+          onChanged: (value) => setState(() {
             data.topColorTip = value;
           }),
         ),
@@ -486,7 +505,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           secondary: const Icon(Icons.aspect_ratio),
           subtitle: Text(data.expandWeekLabelSize.toString()),
           value: data.expandWeekLabel,
-          onChanged: (bool value) => setState(() {
+          onChanged: (value) => setState(() {
             data.expandWeekLabel = value;
           }),
         ),
@@ -505,7 +524,7 @@ class _CustomHeatmapPage extends State<CustomHeatmapPage> {
           ),
           secondary: const Icon(Icons.aspect_ratio),
           value: data.expandMonthLabel,
-          onChanged: (bool value) => setState(() {
+          onChanged: (value) => setState(() {
             data.expandMonthLabel = value;
           }),
         ),

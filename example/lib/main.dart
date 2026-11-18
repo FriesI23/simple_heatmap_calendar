@@ -1,13 +1,11 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
 import 'l10n/localizations.dart';
-
-import 'page_localization.dart';
 import 'page_basic_heatmap.dart';
 import 'page_custom.dart';
+import 'page_localization.dart';
 import 'page_tappable.dart';
 import 'page_with_textscale.dart';
 
@@ -147,17 +145,13 @@ final Map<DateTime, num> textSimple = {
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+  };
 }
 
-bool _useM3Theme = false;
-
-final GlobalKey appKey = GlobalKey<_MyApp>();
-
-void main() async {
-  runApp(MyApp(key: appKey));
+void main() {
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -166,45 +160,39 @@ class MyApp extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _MyApp();
 
-  static void setLocale(BuildContext context, Locale newLocale) async {
-    _MyApp? state = context.findAncestorStateOfType<_MyApp>();
+  static void setLocale(BuildContext context, Locale newLocale) {
+    final _MyApp? state = context.findAncestorStateOfType<_MyApp>();
     state?.changeLanguage(newLocale);
   }
 }
 
 class _MyApp extends State<MyApp> {
   Locale? _locale;
+  bool _useM3Theme = false;
 
-  changeLanguage(Locale locale) {
+  void changeLanguage(Locale locale) {
     setState(() {
       _locale = locale;
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
+  void toggleMaterialVersion() {
+    setState(() {
+      _useM3Theme = !_useM3Theme;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: _useM3Theme,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: _useM3Theme),
       scrollBehavior: CustomScrollBehavior(),
       localizationsDelegates: const [
         L10n.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
+        ...GlobalMaterialLocalizations.delegates,
       ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('zh'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('zh')],
       locale: _locale,
       home: const HomePage(),
       debugShowCheckedModeBanner: false,
@@ -221,7 +209,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePage extends State<HomePage> {
   Widget _buildSimpleHeatmapCalendar(BuildContext context) {
-    var theme = Theme.of(context);
+    final theme = Theme.of(context);
     return HeatmapCalendar<num>(
       startDate: DateTime(2023, 1, 1),
       endedDate: DateTime(2023, 12, 31),
@@ -229,10 +217,10 @@ class _HomePage extends State<HomePage> {
       cellSize: const Size.square(16.0),
       colorTipCellSize: const Size.square(12.0),
       colorMap: {
-        10: theme.primaryColor.withOpacity(0.2),
-        20: theme.primaryColor.withOpacity(0.4),
-        30: theme.primaryColor.withOpacity(0.6),
-        40: theme.primaryColor.withOpacity(0.8),
+        10: theme.primaryColor.withValues(alpha: 0.2),
+        20: theme.primaryColor.withValues(alpha: 0.4),
+        30: theme.primaryColor.withValues(alpha: 0.6),
+        40: theme.primaryColor.withValues(alpha: 0.8),
         50: theme.primaryColor,
       },
       selectedMap: textSimple,
@@ -253,10 +241,10 @@ class _HomePage extends State<HomePage> {
       ),
       cellBuilder: (context, childBuilder, columnIndex, rowIndex, date) =>
           Tooltip(
-        message: date.toIso8601String(),
-        waitDuration: const Duration(seconds: 1),
-        child: childBuilder(context),
-      ),
+            message: date.toIso8601String(),
+            waitDuration: const Duration(seconds: 1),
+            child: childBuilder(context),
+          ),
     );
   }
 
@@ -268,9 +256,9 @@ class _HomePage extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () {
-              appKey.currentState?.setState(() {
-                _useM3Theme = !_useM3Theme;
-              });
+              context
+                  .findAncestorStateOfType<_MyApp>()
+                  ?.toggleMaterialVersion();
             },
             icon: const Icon(Icons.palette),
           ),
@@ -286,33 +274,37 @@ class _HomePage extends State<HomePage> {
           ),
           ListTile(
             title: const Text("Basic Heatmap"),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const BasicHeatmapPage(),
-            )),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const BasicHeatmapPage()),
+            ),
           ),
           ListTile(
             title: const Text("Large Font Size"),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const FontScalePage(),
-            )),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => const FontScalePage()),
+            ),
           ),
           ListTile(
             title: const Text("Tappable & Use Provider"),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const TappableHeatmapPage(),
-            )),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const TappableHeatmapPage(),
+              ),
+            ),
           ),
           ListTile(
             title: const Text("L10n"),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const L10nPage(),
-            )),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (context) => const L10nPage())),
           ),
           ListTile(
             title: const Text("Custom"),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const CustomHeatmapPage(),
-            )),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const CustomHeatmapPage(),
+              ),
+            ),
           ),
         ],
       ),

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
 class BasicHeatmapPage extends StatefulWidget {
@@ -13,9 +13,7 @@ class _BasicHeatmapPage extends State<BasicHeatmapPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Basic Heatmap Calendar"),
-      ),
+      appBar: AppBar(title: const Text("Basic Heatmap Calendar")),
       body: ListView(
         children: [
           Card(
@@ -24,7 +22,8 @@ class _BasicHeatmapPage extends State<BasicHeatmapPage> {
               child: Column(
                 children: [
                   const ListTile(
-                      title: Text("Default (2023-1-3 to 2023-04-10)")),
+                    title: Text("Default (2023-1-3 to 2023-04-10)"),
+                  ),
                   HeatmapCalendar<num>(
                     startDate: DateTime(2023, 1, 3),
                     endedDate: DateTime(2023, 4, 10),
@@ -109,10 +108,10 @@ class _BasicHeatmapPage extends State<BasicHeatmapPage> {
                     ),
                     monthLabelItemBuilder: (context, date, defaultFormat) =>
                         FittedBox(
-                      alignment: Alignment.centerLeft,
-                      fit: BoxFit.scaleDown,
-                      child: Text(DateFormat(defaultFormat).format(date)),
-                    ),
+                          alignment: Alignment.centerLeft,
+                          fit: BoxFit.scaleDown,
+                          child: Text(DateFormat(defaultFormat).format(date)),
+                        ),
                     // cellBuilder:
                     //     (context, childBuilder, columnIndex, rowIndex, date) =>
                     //         childBuilder(

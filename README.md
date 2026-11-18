@@ -15,7 +15,7 @@ Powerful and easy-to-use heatmap flutter chart package.
 - various configuration choices.
 - has better performance when dealing with a large time span on the calendar.
 
-More details check example by run code `example/main.dart`
+See the [runnable example](example/README.md) to explore the available options.
 
 ![sc01][sc01]
 ![sc02][sc02]
@@ -24,11 +24,11 @@ More details check example by run code `example/main.dart`
 ![sc05][sc05]
 ![sc06][sc06]
 
-```shell
-cd exmaple
-flutter pub get
-flutter run --debug # --profile or --release
-```
+## Requirements
+
+Requires **Flutter 3.47.9 / Dart 3.13 or newer**.
+Material components use `material_ui`; host UI and themes must use the same
+standalone package. See Flutter's [migration guide](https://docs.flutter.dev/release/breaking-changes/material-ui-and-cupertino-ui).
 
 ## Getting started
 
@@ -49,9 +49,24 @@ dependencies:
 
 Then run `flutter pub get`
 
+## Development
+
+Development and CI use Flutter 3.47.9, pinned in `.fvmrc`.
+
+```sh
+fvm install
+make check
+```
+
+Use `make help` for other commands. See the [example guide](example/README.md)
+for run and build commands.
+
 ## Usage
 
-```Dart
+```dart
+import 'package:material_ui/material_ui.dart';
+import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -72,10 +87,10 @@ class _HomePage extends State<HomePage> {
             startDate: DateTime(2020, 1, 1),
             endedDate: DateTime(2025, 12, 31),
             colorMap: {
-              10: theme.primaryColor.withOpacity(0.2),
-              20: theme.primaryColor.withOpacity(0.4),
-              30: theme.primaryColor.withOpacity(0.6),
-              40: theme.primaryColor.withOpacity(0.8),
+              10: theme.primaryColor.withValues(alpha: 0.2),
+              20: theme.primaryColor.withValues(alpha: 0.4),
+              30: theme.primaryColor.withValues(alpha: 0.6),
+              40: theme.primaryColor.withValues(alpha: 0.8),
               50: theme.primaryColor,
             },
             selectedMap: {

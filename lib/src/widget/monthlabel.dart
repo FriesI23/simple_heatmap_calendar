@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../heatmap_calendar.dart';
@@ -34,10 +34,16 @@ class MonthLabelItem extends StatelessWidget {
         width: innderWidth,
         height: innderHeight,
         child: DefaultTextStyle(
-          style:
-              TextStyle(color: monthLabelColor, fontSize: monthLabelFontSize),
-          child: monthLabelItemBuilder?.call(
-                  context, date, format.pattern ?? '') ??
+          style: TextStyle(
+            color: monthLabelColor,
+            fontSize: monthLabelFontSize,
+          ),
+          child:
+              monthLabelItemBuilder?.call(
+                context,
+                date,
+                format.pattern ?? '',
+              ) ??
               Text(format.format(date)),
         ),
       ),
@@ -106,16 +112,19 @@ class MonthLabelRow extends StatelessWidget {
           (columns - columnIndex) >= labelTextSizeMultiple) {
         final date = dateMap[columnIndex]!;
         final format = getFormat?.call(date) ?? DateFormat.yM();
-        children.add(MonthLabelItem(
-          date: date,
-          monthLabelColor: monthLabelColor,
-          monthLabelFontSize: monthLabelFontSize,
-          padding: cellPadding,
-          innderWidth: cellSize.width * labelTextSizeMultiple +
-              cellSpaceBetween * (labelTextSizeMultiple - 1),
-          format: format,
-          monthLabelItemBuilder: monthLabelItemBuilder,
-        ));
+        children.add(
+          MonthLabelItem(
+            date: date,
+            monthLabelColor: monthLabelColor,
+            monthLabelFontSize: monthLabelFontSize,
+            padding: cellPadding,
+            innderWidth:
+                cellSize.width * labelTextSizeMultiple +
+                cellSpaceBetween * (labelTextSizeMultiple - 1),
+            format: format,
+            monthLabelItemBuilder: monthLabelItemBuilder,
+          ),
+        );
         columnIndex += labelTextSizeMultiple;
       } else {
         children.add(

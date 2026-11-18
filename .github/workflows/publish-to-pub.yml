@@ -1,0 +1,22 @@
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: read
+
+jobs:
+  testing:
+    name: Test
+    uses: ./.github/workflows/_test.yml
+
+  publish:
+    name: Publish
+    needs:
+      - testing
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1

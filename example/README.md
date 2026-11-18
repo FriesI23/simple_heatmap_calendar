@@ -1,16 +1,33 @@
-# example
+# Simple Heatmap Calendar example
 
-A new Flutter project.
+Material examples covering basic options, font scaling, interaction,
+localization, and custom builders. Uses Flutter 3.47.9 from the repository's FVM pin.
 
-## Getting Started
+## Run
 
-This project is a starting point for a Flutter application.
+From the repository root:
 
-A few resources to get you started if this is your first Flutter project:
+```sh
+fvm install
+make bootstrap
+make gen
+cd example
+fvm flutter run
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Use `-t lib/simple_example.dart` for the smaller example. The palette button
+switches Material 2 / 3; the localization page switches English / Chinese.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Development
+
+Run `make check` from the repository root. After editing `lib/l10n/*.arb`,
+run `make gen` to regenerate localizations.
+
+From this directory, build with the installed platform toolchains:
+
+```sh
+fvm flutter build web --release
+fvm flutter build apk --debug
+fvm flutter build macos --debug
+fvm flutter build ios --debug --no-codesign
+```

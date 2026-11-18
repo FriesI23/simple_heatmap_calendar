@@ -1,0 +1,47 @@
+name: Test CI
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  flutter-test:
+    name: Flutter package and example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+          cache: true
+      - name: Resolve dependencies and generate localizations
+        run: |
+          make bootstrap
+          make gen
+          git diff --exit-code -- example/lib/l10n
+      - name: Check formatting
+        run: make format-check
+      - name: Analyze package and example
+        if: success() || failure()
+        run: make analyze
+      - name: Run package and example tests
+        if: success() || failure()
+        run: |
+          mkdir -p test-results
+          make test CI=1 MACHINE_OUT=test-results/package_test.log
+      - name: Build the Web example
+        if: success() || failure()
+        working-directory: example
+        run: flutter build web --release
+      - name: Validate publishing
+        if: success() || failure()
+        run: make publish-dry-run
+      - uses: actions/upload-artifact@v7
+        if: success() || failure()
+        with:
+          name: flutter-test-results
+          path: test-results/*_test.log
+          if-no-files-found: warn
+          retention-days: 7

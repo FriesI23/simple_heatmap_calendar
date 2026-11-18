@@ -1,0 +1,12 @@
+name: Manual Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  testing:
+    name: Test
+    uses: ./.github/workflows/_test.yml

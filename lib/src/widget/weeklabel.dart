@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:intl/intl.dart';
 
@@ -49,12 +49,13 @@ class WeekLabelItem extends StatelessWidget {
       padding: padding,
       child: HeatmapCell<String>(
         size: cellSize,
-        color: Colors.transparent,
+        color: const Color(0x00000000),
         value: value,
         valueColor: valueColor,
         valueAlignment: valueAlignment,
-        valueBuilder:
-            weekLabelValueBuilder == null && !autoScaled ? null : valueBuilder,
+        valueBuilder: weekLabelValueBuilder == null && !autoScaled
+            ? null
+            : valueBuilder,
         valueSize: valueSize,
       ),
     );
@@ -105,24 +106,21 @@ class WeekLabelColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: List<Widget>.generate(
-        maxDayOfWeek,
-        (rowIndex) {
-          final date = model.getProtoDateByOffsetRow(rowIndex);
-          return WeekLabelItem(
-            date: date,
-            dateFormatter: format.pattern ?? '',
-            value: format.format(date),
-            valueColor: valueColor,
-            valueAlignment: valueAlignment,
-            valueSize: valueSize,
-            padding: getWeekLabelPadding(rowIndex),
-            cellSize: cellSize,
-            autoScaled: autoScaled,
-            weekLabelValueBuilder: weekLabelValueBuilder,
-          );
-        },
-      ),
+      children: List<Widget>.generate(maxDayOfWeek, (rowIndex) {
+        final date = model.getProtoDateByOffsetRow(rowIndex);
+        return WeekLabelItem(
+          date: date,
+          dateFormatter: format.pattern ?? '',
+          value: format.format(date),
+          valueColor: valueColor,
+          valueAlignment: valueAlignment,
+          valueSize: valueSize,
+          padding: getWeekLabelPadding(rowIndex),
+          cellSize: cellSize,
+          autoScaled: autoScaled,
+          weekLabelValueBuilder: weekLabelValueBuilder,
+        );
+      }),
     );
   }
 }

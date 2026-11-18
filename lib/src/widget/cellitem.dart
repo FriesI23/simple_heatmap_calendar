@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../const.dart';
 import '../heatmap_calendar.dart';
@@ -54,14 +54,14 @@ class _HeatmapCellItem extends StatelessWidget {
       valueColor: cellValueColor,
       valueBuilder: autoScaled
           ? (context, value) => FittedBox(
-                child: value != null
-                    ? (valueBuilder != null
+              child: value != null
+                  ? (valueBuilder != null
                         ? valueBuilder!(context, value)
                         : Text(value.toString()))
-                    : (valueBuilder != null
+                  : (valueBuilder != null
                         ? valueBuilder!(context, value)
                         : null),
-              )
+            )
           : valueBuilder,
       valueSize: cellValueSize,
     );
@@ -75,10 +75,7 @@ class _HeatmapCellItem extends StatelessWidget {
       );
     }
 
-    return Padding(
-      padding: padding,
-      child: cell,
-    );
+    return Padding(padding: padding, child: cell);
   }
 }
 
@@ -160,8 +157,9 @@ class HeatmapCellItem<T extends Comparable<T>> extends StatelessWidget {
         tappable: tappable,
         showCellText: showCellText,
         autoScaled: autoScaled,
-        onCellPressed:
-            onCellPressed != null ? () => onCellPressed!(date, value) : null,
+        onCellPressed: onCellPressed != null
+            ? () => onCellPressed!(date, value)
+            : null,
         onCellLongPressed: onCellLongPressed != null
             ? () => onCellLongPressed!(date, value)
             : null,
@@ -174,7 +172,8 @@ class HeatmapCellItem<T extends Comparable<T>> extends StatelessWidget {
             duration: cellChangeAnimateDuration,
             switchInCurve: switchInCurve,
             switchOutCurve: switchOutCurve,
-            transitionBuilder: cellChangeAnimateTransitionBuilder ??
+            transitionBuilder:
+                cellChangeAnimateTransitionBuilder ??
                 AnimatedSwitcher.defaultTransitionBuilder,
             child: buildCell(context),
           )
@@ -201,7 +200,7 @@ class HeatmapCellItemColumn<T extends Comparable<T>> extends StatelessWidget {
   final CellPressedCallback<T>? onCellLongPressed;
   final T? Function(DateTime date)? getValue;
   final EdgeInsetsGeometry Function(int columnIndex, int rowIndex)?
-      getCellPadding;
+  getCellPadding;
   final CellItemBuilder? cellItemBuilder;
 
   const HeatmapCellItemColumn({
@@ -231,45 +230,47 @@ class HeatmapCellItemColumn<T extends Comparable<T>> extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: List<Widget>.generate(
-        maxDayOfWeek,
-        (rowIndex) {
-          final dateColumnIndex =
-              weekLabelLocation == CalendarWeekLabelPosition.left
-                  ? columnIndex - 1
-                  : columnIndex;
-          final date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
+      children: List<Widget>.generate(maxDayOfWeek, (rowIndex) {
+        final dateColumnIndex =
+            weekLabelLocation == CalendarWeekLabelPosition.left
+            ? columnIndex - 1
+            : columnIndex;
+        final date = model.getDateTimeByOffset(rowIndex, dateColumnIndex);
 
-          Widget buildItem(BuildContext context, {ValueBuilder? valueBuilder}) {
-            return HeatmapCellItem<T>(
-              model: model,
-              date: date,
-              value: getValue?.call(date),
-              cellSize: cellSize,
-              cellPadding: getCellPadding?.call(columnIndex, rowIndex) ??
-                  EdgeInsets.zero,
-              cellRadius: cellRadius,
-              cellValueSize: cellValueSize,
-              cellValuePadding: cellValuePadding,
-              showCellText: showCellText,
-              autoScaled: autoScaled,
-              tappable: tappable,
-              cellChangeAnimateDuration: cellChangeAnimateDuration,
-              cellChangeAnimateTransitionBuilder:
-                  cellChangeAnimateTransitionBuilder,
-              getSelectedDateColor: getSelectedDateColor,
-              getSelectedDateValueColor: getSelectedDateValueColor,
-              onCellPressed: onCellPressed,
-              onCellLongPressed: onCellLongPressed,
-              valueBuilder: valueBuilder,
-            );
-          }
+        Widget buildItem(BuildContext context, {ValueBuilder? valueBuilder}) {
+          return HeatmapCellItem<T>(
+            model: model,
+            date: date,
+            value: getValue?.call(date),
+            cellSize: cellSize,
+            cellPadding:
+                getCellPadding?.call(columnIndex, rowIndex) ?? EdgeInsets.zero,
+            cellRadius: cellRadius,
+            cellValueSize: cellValueSize,
+            cellValuePadding: cellValuePadding,
+            showCellText: showCellText,
+            autoScaled: autoScaled,
+            tappable: tappable,
+            cellChangeAnimateDuration: cellChangeAnimateDuration,
+            cellChangeAnimateTransitionBuilder:
+                cellChangeAnimateTransitionBuilder,
+            getSelectedDateColor: getSelectedDateColor,
+            getSelectedDateValueColor: getSelectedDateValueColor,
+            onCellPressed: onCellPressed,
+            onCellLongPressed: onCellLongPressed,
+            valueBuilder: valueBuilder,
+          );
+        }
 
-          return cellItemBuilder?.call(
-                  context, buildItem, columnIndex, rowIndex, date) ??
-              buildItem(context);
-        },
-      ),
+        return cellItemBuilder?.call(
+              context,
+              buildItem,
+              columnIndex,
+              rowIndex,
+              date,
+            ) ??
+            buildItem(context);
+      }),
     );
   }
 }

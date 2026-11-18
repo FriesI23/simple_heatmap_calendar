@@ -3,7 +3,7 @@
 // This software is released under the MIT License.
 // https://opensource.org/licenses/MIT
 
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 extension TextScaleExtension on TextScaler {
   Size scaleForSize<T extends Size>(T size) =>

@@ -1,0 +1,27 @@
+name: Test CI Report
+
+on:
+  workflow_run:
+    workflows:
+      - Check PR / Master
+      - Manual Test
+      - Publish to pub.dev
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
+jobs:
+  report:
+    name: Aggregate Flutter test reports
+    runs-on: ubuntu-latest
+    steps:
+      # Read report artifacts only; never check out or execute PR code here.
+      - uses: dorny/test-reporter@v3
+        with:
+          artifact: flutter-test-results
+          name: Flutter Tests
+          path: '*_test.log'
+          reporter: flutter-json

@@ -1,13 +1,13 @@
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
 
 class CustomScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-        PointerDeviceKind.touch,
-        PointerDeviceKind.mouse,
-      };
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+  };
 }
 
 void main() async {
@@ -44,7 +44,7 @@ class HomePage extends StatefulWidget {
 class _HomePage extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    var theme = Theme.of(context);
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text("Simple Heatmap Calendar")),
       body: Card(
@@ -54,10 +54,10 @@ class _HomePage extends State<HomePage> {
             startDate: DateTime(2020, 1, 1),
             endedDate: DateTime(2025, 12, 31),
             colorMap: {
-              10: theme.primaryColor.withOpacity(0.2),
-              20: theme.primaryColor.withOpacity(0.4),
-              30: theme.primaryColor.withOpacity(0.6),
-              40: theme.primaryColor.withOpacity(0.8),
+              10: theme.primaryColor.withValues(alpha: 0.2),
+              20: theme.primaryColor.withValues(alpha: 0.4),
+              30: theme.primaryColor.withValues(alpha: 0.6),
+              40: theme.primaryColor.withValues(alpha: 0.8),
               50: theme.primaryColor,
             },
             selectedMap: {

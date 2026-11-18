@@ -1,6 +1,7 @@
-import 'package:example/l10n/utils.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:simple_heatmap_calendar/simple_heatmap_calendar.dart';
+
+import 'l10n/utils.dart';
 
 class FontScalePage extends StatefulWidget {
   const FontScalePage({super.key});
@@ -14,8 +15,9 @@ class _FontScalePage extends State<FontScalePage> {
 
   Widget _buildHeatmapUseMediaQuery(BuildContext context) {
     final textScale = MediaQuery.textScalerOf(context);
-    final calendarSize = textScale
-        .scaleForSize(Size(defaultCellSize.width, defaultCellSize.height));
+    final calendarSize = textScale.scaleForSize(
+      Size(defaultCellSize.width, defaultCellSize.height),
+    );
 
     return HeatmapCalendar<num>(
       startDate: DateTime(2020, 1, 3),
@@ -41,9 +43,7 @@ class _FontScalePage extends State<FontScalePage> {
         weekLabelPosition: CalendarWeekLabelPosition.right,
         colorTipPosition: CalendarColorTipPosition.bottom,
       ),
-      style: const HeatmapCalendarStyle.defaults(
-        colorTipPosOffset: 30,
-      ),
+      style: const HeatmapCalendarStyle.defaults(colorTipPosOffset: 30),
       switchParameters: const HeatmapSwitchParameters.defaults(
         showCellText: true,
       ),
@@ -62,9 +62,7 @@ class _FontScalePage extends State<FontScalePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Workaround when font scale changed"),
-      ),
+      appBar: AppBar(title: const Text("Workaround when font scale changed")),
       body: ListView(
         children: [
           Card(
@@ -84,16 +82,15 @@ class _FontScalePage extends State<FontScalePage> {
                   ),
                   MediaQuery(
                     data: MediaQuery.of(context).copyWith(
-                        textScaler: MediaQuery.textScalerOf(context)
-                            .clamp(minScaleFactor: _crtfontScale)),
-                    child: Builder(
-                      builder: (context) => _buildHeatmapUseMediaQuery(context),
+                      textScaler: MediaQuery.textScalerOf(context)
+                          .clamp(minScaleFactor: _crtfontScale),
                     ),
+                    child: Builder(builder: _buildHeatmapUseMediaQuery),
                   ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
