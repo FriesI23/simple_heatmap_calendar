@@ -1,16 +1,16 @@
-import 'package:flutter/material.dart';
-
-import 'package:intl/intl.dart';
+import 'package:flutter/widgets.dart';
 
 import '../const.dart';
 import '../heatmap_calendar.dart';
+import '../label_formatters.dart';
 import '../utils.dart';
 
 import '_cell.dart';
 
 class WeekLabelItem extends StatelessWidget {
   final DateTime date;
-  final String dateFormatter;
+
+  /// Formatted text passed to [weekLabelValueBuilder] and used by default.
   final String? value;
   final Color? valueColor;
   final Alignment? valueAlignment;
@@ -23,7 +23,6 @@ class WeekLabelItem extends StatelessWidget {
   const WeekLabelItem({
     super.key,
     required this.date,
-    required this.dateFormatter,
     this.value,
     this.valueColor,
     this.valueAlignment,
@@ -38,7 +37,7 @@ class WeekLabelItem extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget? valueBuilder(BuildContext context, String? value) {
       if (weekLabelValueBuilder != null) {
-        return weekLabelValueBuilder!(context, date, dateFormatter);
+        return weekLabelValueBuilder!(context, date, value ?? '');
       }
       if (value == null) return null;
       if (autoScaled) return FittedBox(child: Text(value));
@@ -49,12 +48,13 @@ class WeekLabelItem extends StatelessWidget {
       padding: padding,
       child: HeatmapCell<String>(
         size: cellSize,
-        color: Colors.transparent,
+        color: const Color(0x00000000),
         value: value,
         valueColor: valueColor,
         valueAlignment: valueAlignment,
-        valueBuilder:
-            weekLabelValueBuilder == null && !autoScaled ? null : valueBuilder,
+        valueBuilder: weekLabelValueBuilder == null && !autoScaled
+            ? null
+            : valueBuilder,
         valueSize: valueSize,
       ),
     );
@@ -63,7 +63,10 @@ class WeekLabelItem extends StatelessWidget {
 
 class WeekLabelColumn extends StatelessWidget {
   final HeatmapCalendarLocationCalclator model;
-  final DateFormat format;
+
+  /// Locale passed to [formatter], defaulting to the surrounding locale or en.
+  final Locale? locale;
+  final WeekLabelFormatter formatter;
   final Color? valueColor;
   final Alignment? valueAlignment;
   final double? valueSize;
@@ -77,7 +80,8 @@ class WeekLabelColumn extends StatelessWidget {
   const WeekLabelColumn({
     super.key,
     required this.model,
-    required this.format,
+    this.locale,
+    this.formatter = defaultWeekLabelFormatter,
     this.valueColor,
     this.valueAlignment,
     this.valueSize,
@@ -103,26 +107,24 @@ class WeekLabelColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveLocale =
+        locale ?? Localizations.maybeLocaleOf(context) ?? const Locale('en');
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: List<Widget>.generate(
-        maxDayOfWeek,
-        (rowIndex) {
-          final date = model.getProtoDateByOffsetRow(rowIndex);
-          return WeekLabelItem(
-            date: date,
-            dateFormatter: format.pattern ?? '',
-            value: format.format(date),
-            valueColor: valueColor,
-            valueAlignment: valueAlignment,
-            valueSize: valueSize,
-            padding: getWeekLabelPadding(rowIndex),
-            cellSize: cellSize,
-            autoScaled: autoScaled,
-            weekLabelValueBuilder: weekLabelValueBuilder,
-          );
-        },
-      ),
+      children: List<Widget>.generate(maxDayOfWeek, (rowIndex) {
+        final date = model.getProtoDateByOffsetRow(rowIndex);
+        return WeekLabelItem(
+          date: date,
+          value: formatter(date, effectiveLocale),
+          valueColor: valueColor,
+          valueAlignment: valueAlignment,
+          valueSize: valueSize,
+          padding: getWeekLabelPadding(rowIndex),
+          cellSize: cellSize,
+          autoScaled: autoScaled,
+          weekLabelValueBuilder: weekLabelValueBuilder,
+        );
+      }),
     );
   }
 }

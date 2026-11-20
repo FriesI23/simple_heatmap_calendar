@@ -131,8 +131,8 @@ app.*.symbols
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 !/dev/ci/**/Gemfile.lock
 
-# fvm
-.fvm/flutter_sdk
-.fvm/release
-.fvm/version
-.fvm/versions/
+# FVM (the SDK version is tracked in .fvmrc).
+.fvm/
+
+# Local test reports.
+test-results/

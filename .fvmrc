@@ -1,1 +1,3 @@
-./.fvm/fvm_config.json
+{
+  "flutter": "3.47.9"
+}

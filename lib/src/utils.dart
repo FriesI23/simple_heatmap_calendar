@@ -7,8 +7,16 @@ extension DateArithmetic on DateTime {
     if (isUtc) {
       return subtract(Duration(days: days));
     } else {
-      return DateTime(year, month, day - days, hour, minute, second,
-          millisecond, microsecond);
+      return DateTime(
+        year,
+        month,
+        day - days,
+        hour,
+        minute,
+        second,
+        millisecond,
+        microsecond,
+      );
     }
   }
 
@@ -18,8 +26,16 @@ extension DateArithmetic on DateTime {
     if (isUtc) {
       return add(Duration(days: days));
     } else {
-      return DateTime(year, month, day + days, hour, minute, second,
-          millisecond, microsecond);
+      return DateTime(
+        year,
+        month,
+        day + days,
+        hour,
+        minute,
+        second,
+        millisecond,
+        microsecond,
+      );
     }
   }
 
@@ -48,9 +64,9 @@ class HeatmapCalendarLocationCalclator {
     required this.endedDate,
     required this.firstDay,
     required this.withUTC,
-  })  : assert(firstDay > 0 && firstDay <= 7),
-        assert(startDate.isUtc == endedDate.isUtc),
-        assert(startDate.isUtc == withUTC);
+  }) : assert(firstDay > 0 && firstDay <= 7),
+       assert(startDate.isUtc == endedDate.isUtc),
+       assert(startDate.isUtc == withUTC);
 
   int get offsetRowWithStartDate => getOffsetRow(startDate);
 

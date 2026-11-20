@@ -1,4 +1,4 @@
-library simple_heatmap_calendar;
+library;
 
 export 'src/const.dart' hide maxDayOfWeek;
 export 'src/heatmap_calendar.dart'
@@ -13,7 +13,10 @@ export 'src/heatmap_calendar.dart'
         HeatmapCalendarStyle,
         HeatmapCallbackModel,
         HeatmapLayoutParameters,
-        HeatmapSwitchParameters;
+        HeatmapSwitchParameters,
+        MonthLabelValueBuilder,
+        WeekLabelValueBuilder;
+export 'src/label_formatters.dart';
 export 'src/widget/_cell.dart' show HeatmapCell;
 export 'src/widget/cellitem.dart' show HeatmapCellItem, HeatmapCellItemColumn;
 export 'src/widget/colortip.dart' show HeatmapColorTip;
