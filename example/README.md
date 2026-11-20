@@ -39,11 +39,7 @@ and delegates to initialize locale data. The minimal example uses English defaul
 Run `make check` from the repository root. After editing `lib/l10n/*.arb`,
 run `make gen`; do not edit generated localization files.
 
-To regenerate the README's compressed, looping WebP animations, install the WebP
-command-line tools (`img2webp`) and run `make capture-demos` from the repository
-root. The scenarios render actual widgets and exercise their gestures. Raw frames
-stay in `build/example-demos/`, and `screenshots/.pubignore` excludes the animations
-from pub.dev packages.
+For README animations, follow the [demo capture rules](../AGENTS.md#readme-demo-capture).
 
 Build with the installed platform toolchains:
 

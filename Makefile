@@ -22,7 +22,7 @@ endif
 FLUTTER := $(LOCAL_FLUTTER)
 DART := $(LOCAL_DART)
 EXAMPLE_DIR := example
-DART_DIRS := lib test $(EXAMPLE_DIR)/lib $(EXAMPLE_DIR)/test $(EXAMPLE_DIR)/tool
+DART_DIRS := lib test $(EXAMPLE_DIR)/lib $(EXAMPLE_DIR)/test
 
 # Machine output supplements the readable reporter and preserves test exit codes.
 # MACHINE_OUT is relative to the repository root; example_<filename> is written
@@ -35,14 +35,13 @@ TEST_ARGS := $(TEST_REPORTER) \
 EXAMPLE_TEST_ARGS := $(TEST_REPORTER) \
              $(if $(MACHINE_OUT),--file-reporter="json:$(dir $(abspath $(MACHINE_OUT)))example_$(notdir $(MACHINE_OUT))",)
 
-.PHONY: help bootstrap format format-check fix analyze test test-package test-example gen check aio capture-demos publish-dry-run
+.PHONY: help bootstrap format format-check fix analyze test test-package test-example gen check aio publish-dry-run
 
 help:
 	@echo "simple_heatmap_calendar - automation entrypoints"
 	$(BLANK_LINE)
 	@echo "  bootstrap       Resolve package and example dependencies"
 	@echo "  gen             Generate example localizations"
-	@echo "  capture-demos   Record README animations (requires WebP tools and bash)"
 	@echo "  publish-dry-run Validate the package for pub.dev"
 	@echo "  format          Format package and example Dart sources"
 	@echo "  format-check    Verify Dart formatting without modifying files"
@@ -101,7 +100,3 @@ aio:
 	@$(SUBMAKE) fix
 	@$(SUBMAKE) analyze
 	@$(SUBMAKE) test
-
-capture-demos:
-	@cd "$(EXAMPLE_DIR)" && "$(FLUTTER)" test tool/capture_demos.dart
-	@bash $(EXAMPLE_DIR)/tool/encode_demos.sh
