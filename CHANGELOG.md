@@ -1,6 +1,6 @@
 # Change log
 
-## Unreleased
+## 0.5.0
 
 - **Breaking:** Remove the direct `intl` dependency. Labels default to English;
   use label formatters for localization. Label builder arguments and exported
