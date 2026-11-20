@@ -1,5 +1,9 @@
 # Change log
 
+## 0.5.1
+
+- Update README project links and copyright notices.
+
 ## 0.5.0
 
 - **Breaking:** Remove the direct `intl` dependency. Labels default to English;
